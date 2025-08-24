@@ -263,12 +263,7 @@ const updateCartIndicator = () => {
     window.scrollY > 100 ? selectBody.classList.add('scrolled') : selectBody.classList.remove('scrolled');
   };
 
-  const mobileNavToogle = () => {
-    if (!selectBody || !mobileNavToggleBtn) return;
-    selectBody.classList.toggle('mobile-nav-active');
-    mobileNavToggleBtn.classList.toggle('bi-list');
-    mobileNavToggleBtn.classList.toggle('bi-x');
-  };
+
 
   const aosInit = () => AOS.init({ duration: 600, easing: 'ease-in-out', once: true, mirror: false });
   const initSwiper = () => document.querySelectorAll(".init-swiper").forEach(el => new Swiper(el, JSON.parse(el.querySelector(".swiper-config").innerHTML.trim())));
@@ -297,6 +292,9 @@ const initializeNavbarFeaturesAndListeners = () => {
     // For mobile nav links, close the menu when a link (or dropdown item) is clicked
     document.querySelectorAll('#navbarNav .nav-link, #navbarNav .dropdown-item').forEach(link => {
         link.addEventListener('click', () => {
+            if (link.classList.contains('dropdown-toggle')) {
+              return;
+            }
             // Check if the menu is currently shown
             if (navbarCollapseElement.classList.contains('show')) {
                 // Get the Bootstrap Collapse instance and hide it

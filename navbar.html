@@ -316,18 +316,6 @@
         }
     }
 
-    /* Mobile Nav Overlay (Requires JS to add 'mobile-nav-active' and 'header-overlay' classes to <body>) */
-    body.mobile-nav-active.header-overlay::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background: color-mix(in srgb, var(--default-color), transparent 20%);
-        /* Semi-transparent overlay */
-        z-index: 9996;
-        /* Below navbar, above page content */
-        transition: opacity 0.3s ease-in-out;
-    }
-
     /* Adjust the toggler button when mobile menu is active */
     body.mobile-nav-active .mobile-nav-toggler {
         color: #fff;
