@@ -3,12 +3,12 @@
 
 <head>
     <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="width-device-width, initial-scale=1.0" name="viewport">
     <title>About Us - KuihTradisi</title>
     <meta name="description"
-        content="Discover the story behind KuihTradisi, your online destination for authentic Malaysian Nyonya kuih, handcrafted with heritage recipes and fresh ingredients.">
+        content="Discover the story behind KuihTradisi, your online destination for authentic Malaysian Nyonya kuih, handcrafted with heritage recipes and fresh ingredients. Learn why customers choose us.">
     <meta name="keywords"
-        content="Nyonya kuih, Malaysian desserts, traditional snacks, authentic recipes, heritage, online kuih, handcrafted">
+        content="Nyonya kuih, Malaysian desserts, traditional snacks, authentic recipes, heritage, online kuih, handcrafted, why choose us, company story">
 
     <!-- Favicons -->
     <link href="assets/img/favicon.png" rel="icon">
@@ -30,6 +30,131 @@
 
     <!-- Main CSS File -->
     <link href="assets/css/main.css" rel="stylesheet">
+
+    <!-- Page-Specific Styles for Enhanced Design -->
+    <style>
+        /* Immersive "Why Choose Us" Section */
+        .why-us-immersive {
+            position: relative;
+            padding: 80px 0;
+            color: #fff;
+            /* White text for contrast */
+        }
+
+        .faded-image {
+            width: 600px;
+            border-radius: 23px;
+            /* optional if you still want rounded edges */
+
+            /* Fade all around */
+            -webkit-mask-image: radial-gradient(circle, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0) 100%);
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            -webkit-mask-size: cover;
+
+            mask-image: radial-gradient(circle, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0) 100%);
+            mask-repeat: no-repeat;
+            mask-position: center;
+            mask-size: cover;
+        }
+
+        .why-us-bg {
+            position: absolute;
+            inset: 0;
+            background: url('assets/img/bg-about.png') center center no-repeat;
+            background-size: cover;
+            z-index: 1;
+        }
+
+        .why-us-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(51, 47, 47, 0.9);
+            /* Dark Brown Overlay from your palette */
+            z-index: 2;
+        }
+
+        .why-us-immersive .container {
+            position: relative;
+            z-index: 3;
+        }
+
+        /* Override section title colors for this section */
+        .why-us-immersive .section-title h2 {
+            color: #fff;
+            font-size: 1.4rem;
+        }
+
+        .why-us-immersive .section-title p {
+            color: #fff;
+            font-size: 4.5rem;
+        }
+
+        .why-us-immersive .section-title p .description-title {
+            color: color-mix(in srgb, var(--accent-color), #fff 30%);
+            /* Lighter teal for contrast */
+            font-weight: bold;
+        }
+
+        .why-us-box {
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            text-align: center;
+            height: 100%;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .why-us-box:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .why-us-box i {
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .why-us-box h4 {
+            font-family: var(--default-font);
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .why-us-box p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Enhanced "Our Story" Section */
+        .story-intro {
+            max-width: 800px;
+            margin: 0 auto 60px auto;
+        }
+
+        .story-intro h3 {
+            font-family: var(--heading-font);
+            font-size: 2.6rem;
+            color: var(--heading-color);
+            line-height: 1.2;
+        }
+
+        .story-intro .highlight {
+            color: var(--accent-color);
+        }
+
+        .our-story .content-block {
+            padding: 20px;
+        }
+
+        .our-story .content-block img {
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 
 <body class="about-page">
@@ -39,66 +164,138 @@
 
     <main class="main">
 
-        <!-- About Section -->
-        <section id="about" class="about section">
+        <!-- NEW: Why Choose Us Section -->
+        <section id="why-choose-us" class="why-us-immersive section">
+
+            <div class="why-us-bg"></div> <!-- Background Image & Overlay -->
+
+            <div class="container">
+                <!-- Section Title -->
+                <div class="section-title text-center" data-aos="fade-up">
+                    <h2>Our Commitment</h2>
+                    <p><span>Why Choose</span> <span class="description-title">KuihTradisi?</span></p>
+                </div><!-- End Section Title -->
+
+                <div class="row gy-4 mt-4">
+                    <!-- Box 1: Authentic Heritage Recipes -->
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="why-us-box">
+                            <i class="bi bi-book"></i>
+                            <h3 style="color: #fff; font-size: 2rem;">Heritage Recipes</h3>
+                            <p>Generations of Nyonya culinary wisdom, meticulously preserved and handcrafted for an
+                                authentic taste.</p>
+                        </div>
+                    </div>
+                    <!-- Box 2: Fresh & Premium Ingredients -->
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="why-us-box">
+                            <i class="bi bi-flower1"></i>
+                            <h3 style="color: #fff; font-size: 2rem;">Premium Ingredients</h3>
+                            <p>Only the freshest, natural, and Halal-certified ingredients are used in every delightful
+                                kuih we make.</p>
+                        </div>
+                    </div>
+                    <!-- Box 3: Handcrafted Excellence -->
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                        <div class="why-us-box">
+                            <i class="bi bi-gem"></i>
+                            <h3 style="color: #fff; font-size: 2rem;">Artisanal Craftsmanship</h3>
+                            <p>Each piece is a miniature edible art, created with the passion, precision, and care of
+                                true artisans.</p>
+                        </div>
+                    </div>
+                    <!-- Box 4: Convenient Online & Delivery -->
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                        <div class="why-us-box">
+                            <i class="bi bi-truck"></i>
+                            <h3 style="color: #fff; font-size: 2rem;">Convenient Delivery</h3>
+                            <p>Enjoy authentic Nyonya kuih delivered fresh from our kitchen to your doorstep across
+                                Malaysia.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section><!-- /Why Choose Us Section -->
+
+        <!-- NEW: Our Story Section -->
+        <section id="our-story" class="our-story section light-background">
 
             <!-- Section Title -->
             <div class="container section-title" data-aos="fade-up">
-                <h2>Our Story<br></h2> <!-- Changed to "Our Story" for a more personal touch -->
-                <p><span>Learn More</span> <span class="description-title">About Us</span></p>
+                <h2 style="font-size: 1.5rem;">Our Journey</h2>
+                <p style="font-size: 5rem"><span>The Story Behind</span> <span
+                        class="description-title">KuihTradisi</span></p>
             </div><!-- End Section Title -->
 
             <div class="container">
 
-                <div class="row gy-4">
-                    <div class="col-lg-7" data-aos="fade-up" data-aos-delay="100">
-                        <!-- Replace with an image of Nyonya kuih, a kitchen, or historical photo -->
-                        <img src="assets/img/about.jpg" class="img-fluid mb-4"
-                            alt="Traditional Nyonya Kuih preparation">
-                        <!-- The "Book a Table" section is removed as it's not relevant for an e-commerce site -->
-                    </div>
-                    <div class="col-lg-5" data-aos="fade-up" data-aos-delay="250">
-                        <div class="content ps-0 ps-lg-5">
-                            <p class="fst-italic">
-                                At KuihTradisi, we are passionate custodians of Malaysia's rich Nyonya culinary
-                                heritage,
-                                dedicated to bringing authentic, handcrafted kuih directly to your doorstep.
-                            </p>
-                            <ul>
-                                <li><i class="bi bi-check-circle-fill"></i> <span>Handcrafted with traditional recipes
-                                        passed down through generations.</span></li>
-                                <li><i class="bi bi-check-circle-fill"></i> <span>Using only the freshest, high-quality
-                                        natural ingredients.</span></li>
-                                <li><i class="bi bi-check-circle-fill"></i> <span>Committed to preserving the unique
-                                        flavors and artistry of each Nyonya delicacy.</span></li>
-                            </ul>
-                            <p>
-                                Our journey began with a simple desire: to share the authentic taste of Nyonya kuih with
-                                everyone.
-                                We meticulously craft each delicacy, ensuring every piece is a testament to our
-                                unwavering
-                                commitment to quality. Using only fresh, natural, and Halal-certified ingredients, we
-                                honor
-                                the time-consuming, labor-intensive traditions of Nyonya kuih making. This dedication
-                                ensures
-                                that every bite is not just flavorful, but also a step towards preserving the treasured
-                                heritage
-                                passed down through generations.
-                            </p>
 
-                            <div class="position-relative mt-4">
-                                <!-- Replace with an image of Nyonya kuih or a related cultural scene -->
-                                <img src="assets/img/about-2.jpg" class="img-fluid" alt="Nyonya Kuih assortment">
-                                <!-- Replace with a YouTube link to a video about Nyonya kuih making or the brand's story -->
-                                <a href="https://www.youtube.com/watch?v=YOUR_NYONYA_KUIH_VIDEO_ID"
-                                    class="glightbox pulsating-play-btn"></a>
-                            </div>
+                <!-- NEW: Story Content Block 1 (Text Left, Image Right) -->
+                <div class="row gy-4 align-items-center mb-5">
+                    <div class="col-lg-6 content-block" data-aos="fade-right" data-aos-delay="200">
+                        <h3 style="font-size: 3rem;">A Legacy of Flavor</h3>
+                        <p style="text-align: justify; font-size: 1.2rem;">
+                            Our journey began not just as a business, but as a passion project. We understood the time,
+                            precision, and love that goes into making each traditional Nyonya kuih. At KuihTradisi, we
+                            embrace this challenge, meticulously crafting every delicacy to reflect authentic flavors.
+                        </p>
+                        <ul>
+                            <li><i class="bi bi-check-circle-fill"></i> <span
+                                    style="text-align: justify; font-size: 1.2rem;">Handcrafted using recipes passed
+                                    down
+                                    through generations.</span></li>
+                            <li><i class="bi bi-check-circle-fill"></i> <span
+                                    style="text-align: justify; font-size: 1.2rem;">Sourced from the finest natural,
+                                    Halal-certified ingredients.</span></li>
+                            <li><i class="bi bi-check-circle-fill"></i> <span
+                                    style="text-align: justify; font-size: 1.2rem;">A dedication to the intricate
+                                    techniques
+                                    that define true Nyonya kuih.</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-6" data-aos="fade-left" data-aos-delay="300">
+                        <img src="assets/img/about.png" class="faded-image"
+                            alt="A close-up of vibrant Nyonya Kuih being prepared by an artisan">
+                    </div>
+                </div>
+
+                <!-- NEW: Story Intro Block -->
+                <div class="story-intro text-center" data-aos="fade-up" data-aos-delay="100">
+                    <h3 class="fst-italic">
+                        Our mission is to preserve the Nyonya traditions
+                        <br>
+                        <span class="highlight">one delicious bite at a time.</span>
+                    </h3>
+                </div>
+
+
+                <!-- NEW: Story Content Block 2 (Image Left, Text Right) -->
+                <div class="row gy-4 align-items-center">
+                    <div class="col-lg-6 order-lg-2 content-block" data-aos="fade-left" data-aos-delay="200">
+                        <h3 style="font-size: 3rem;">More Than a Dessert</h3>
+                        <p style="text-align: justify; font-size: 1.2rem;">
+                            We believe that Nyonya kuih is more than just a sweet treat; it's a piece of cultural
+                            history, a symbol of communal gatherings, and a testament to the rich tapestry of Malaysian
+                            identity.
+                        </p>
+                        <p style="text-align: justify; font-size: 1.2rem;">
+                            By offering these handcrafted treasures online, we aim to bridge the gap between tradition
+                            and modern convenience, making these delightful treats accessible to everyone. From those
+                            seeking a taste of nostalgia to newcomers eager to explore Malaysian heritage, we invite you
+                            to join us in celebrating this sweet legacy.
+                        </p>
+                    </div>
+                    <div class="col-lg-6 order-lg-1" data-aos="fade-right" data-aos-delay="300">
+                        <div class="position-relative">
+                            <img src="assets/img/platter.png" class="faded-image"
+                                alt="An elegant assortment of Nyonya Kuih with traditional decorative elements">
                         </div>
                     </div>
                 </div>
 
             </div>
-
+        </section><!-- /Our Story Section -->
 
     </main>
 
@@ -113,11 +310,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/purecounterjs@1.1.0/dist/purecounter_vanilla.js"></script>
-    <!-- PureCounter CDN -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/purecounterjs@1.1.0/dist/purecounter_vanilla.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
 

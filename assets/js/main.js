@@ -1,10 +1,3 @@
-/**
-* Template Name: Yummy
-* Template URL: https://bootstrapmade.com/yummy-bootstrap-restaurant-website-template/
-* Updated: Aug 07 2024 with Bootstrap v5.3.3
-* Author: BootstrapMade.com
-* License: https://bootstrapmade.com/license/
-*/
 
 (function() {
   "use strict";
@@ -226,14 +219,15 @@
   // --- END REVIEWS MANAGEMENT ---
 
   // --- UI UPDATES ---
-  const updateCartIndicator = () => {
-    const totalItems = window.getCart().reduce((sum, item) => sum + item.quantity, 0);
-    const cartIndicator = document.getElementById('cart-indicator');
-    if (cartIndicator) {
-        cartIndicator.textContent = totalItems;
-        cartIndicator.style.display = totalItems > 0 ? 'inline-block' : 'none';
-    }
-  };
+const updateCartIndicator = () => {
+  const cart = window.getCart();
+  const uniqueItems = cart.length; // number of unique items in cart
+  const cartIndicator = document.getElementById('cart-indicator');
+  if (cartIndicator) {
+    cartIndicator.textContent = uniqueItems;
+    cartIndicator.style.display = uniqueItems > 0 ? 'inline-block' : 'none';
+  }
+};
 
   const updateAccountDropdown = () => {
     const accountDropdownMenu = document.getElementById('account-dropdown-menu');
@@ -281,39 +275,64 @@
   // --- END GENERAL UTILITY FUNCTIONS ---
 
   // --- DYNAMIC CONTENT LOADING (Navbar, Footer, Product Modal) ---
-  const initializeNavbarFeaturesAndListeners = () => {
-    selectHeader = document.querySelector('#header');
-    mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
+const initializeNavbarFeaturesAndListeners = () => {
+  selectHeader = document.querySelector('#header');
+  
+  // Listen to Bootstrap's collapse events for the mobile menu
+  const navbarCollapseElement = document.getElementById('navbarNav');
+  if (navbarCollapseElement) {
+    navbarCollapseElement.addEventListener('show.bs.collapse', () => {
+      // Add classes to body for the overlay effect and update toggler icon
+      selectBody.classList.add('mobile-nav-active', 'header-overlay');
+      document.querySelector('.mobile-nav-toggler i')?.classList.remove('bi-list');
+      document.querySelector('.mobile-nav-toggler i')?.classList.add('bi-x');
+    });
+    navbarCollapseElement.addEventListener('hide.bs.collapse', () => {
+      // Remove classes from body and revert toggler icon
+      selectBody.classList.remove('mobile-nav-active', 'header-overlay');
+      document.querySelector('.mobile-nav-toggler i')?.classList.remove('bi-x');
+      document.querySelector('.mobile-nav-toggler i')?.classList.add('bi-list');
+    });
 
-    document.addEventListener('scroll', toggleScrolled);
-    mobileNavToggleBtn?.addEventListener('click', mobileNavToogle);
+    // For mobile nav links, close the menu when a link (or dropdown item) is clicked
+    document.querySelectorAll('#navbarNav .nav-link, #navbarNav .dropdown-item').forEach(link => {
+        link.addEventListener('click', () => {
+            // Check if the menu is currently shown
+            if (navbarCollapseElement.classList.contains('show')) {
+                // Get the Bootstrap Collapse instance and hide it
+                const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapseElement);
+                if (bsCollapse) {
+                    bsCollapse.hide();
+                }
+            }
+        });
+    });
+  }
 
-    document.querySelectorAll('#navmenu a').forEach(link => {
-      link.addEventListener('click', () => {
-        if (selectBody.classList.contains('mobile-nav-active')) mobileNavToogle();
-      });
-      // Set active link
-      const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-      link.classList.remove('active');
-      const linkHref = link.getAttribute('href');
-      if (linkHref && linkHref.split('/').pop() === currentPath) {
-        link.classList.add('active');
-        link.closest('.dropdown')?.querySelector('a:first-child')?.classList.add('active');
+  // Keep for 'scrolled' class effect on header
+  document.addEventListener('scroll', toggleScrolled);
+
+  // Set active link logic for Bootstrap nav-link and dropdown-item
+  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('#navbarNav .nav-link, #navbarNav .dropdown-item').forEach(link => {
+    link.classList.remove('active'); // Clear existing active states
+
+    const linkHref = link.getAttribute('href');
+    if (linkHref && linkHref.split('/').pop() === currentPath) {
+      link.classList.add('active');
+      // For dropdown items, also activate their parent dropdown link
+      if (link.classList.contains('dropdown-item')) {
+          link.closest('.dropdown')?.querySelector('.nav-link.dropdown-toggle')?.classList.add('active');
       }
-    });
+    }
+  });
 
-    document.querySelectorAll('.navmenu .toggle-dropdown').forEach(navmenu => {
-      navmenu.addEventListener('click', function(e) {
-        e.preventDefault();
-        this.parentNode.classList.toggle('active');
-        this.parentNode.nextElementSibling.classList.toggle('dropdown-active');
-        e.stopImmediatePropagation();
-      });
-    });
-    toggleScrolled();
-    updateCartIndicator();
-    updateAccountDropdown();
-  };
+  // Initial check for scroll and update UI elements
+  toggleScrolled();
+  updateCartIndicator();
+  updateAccountDropdown();
+};
+
 
   const initializeFooterFeaturesAndListeners = () => {
     scrollTopBtn = document.querySelector('#scroll-top');

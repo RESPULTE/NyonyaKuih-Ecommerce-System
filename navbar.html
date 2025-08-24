@@ -1,49 +1,349 @@
-<header id="header" class="header d-flex align-items-center sticky-top">
-    <div class="container position-relative d-flex align-items-center justify-content-between">
+<header id="header" class="header sticky-top">
+    <nav class="navbar navbar-expand-lg p-0"> <!-- p-0 to let the header control padding -->
+        <div class="container position-relative d-flex align-items-center justify-content-between">
 
-        <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
-            <h1 class="sitename">KuihTradisi</h1>
-            <span>.</span>
-        </a>
+            <a href="index.html" class="navbar-brand logo d-flex align-items-center me-auto me-xl-0">
+                <h1 class="sitename">KuihTradisi</h1>
+                <span class="logo-dot">.</span> <!-- Added a specific class for the dot -->
+            </a>
 
-        <nav id="navmenu" class="navmenu">
-            <ul>
-                <li><a href="index.html">Home<br></a></li>
-                <li class="dropdown"><a href="#"><span>About Us</span> <i
-                            class="bi bi-chevron-down toggle-dropdown"></i></a>
-                    <ul>
-                        <li><a href="about.html">Our Story</a></li>
-                        <li><a href="heritage.html">Nyonya Heritage</a></li>
-                        <li><a href="artisans.html">Our Artisans</a></li>
-                    </ul>
-                </li>
-                <li><a href="menu.html">Our Kuih</a></li>
-                <li class="dropdown"><a href="#"><span>Reviews</span> <i
-                            class="bi bi-chevron-down toggle-dropdown"></i></a>
-                    <ul>
-                        <li><a href="ratings.html">Submit a Review</a></li>
-                        <li><a href="reviews.html">Customer Reviews</a></li>
-                    </ul>
-                </li>
-                <li><a href="contact.html">Contact & Locations</a></li>
-                <li class="dropdown" id="account-dropdown">
-                    <a href="#">
-                        <span id="account-username">My Account</span>
-                        <i class="bi bi-person-circle" style="font-size: 1.2em; margin-left: 5px;"></i>
-                        <i class="bi bi-chevron-down toggle-dropdown"></i>
-                    </a>
-                    <ul id="account-dropdown-menu">
-                        <!-- Content will be dynamically loaded by JS -->
-                    </ul>
-                </li>
-            </ul>
-            <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-        </nav>
+            <!-- Mobile Navbar Toggle Button -->
+            <button class="navbar-toggler mobile-nav-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <i class="bi bi-list"></i>
+            </button>
 
-        <a class="btn-getstarted" href="checkout.html">
-            Checkout
-            <span id="cart-indicator" class="badge rounded-pill bg-danger" style="display: none;">0</span>
-        </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto custom-navbar-nav"> <!-- ms-auto pushes nav items to the right -->
+                    <li class="nav-item"><a class="nav-link custom-navbar-link" href="index.html">Home</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link custom-navbar-link dropdown-toggle" href="#" id="aboutUsDropdown"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span>About Us</span>
+                        </a>
+                        <ul class="dropdown-menu custom-dropdown-menu" aria-labelledby="aboutUsDropdown">
+                            <li><a class="dropdown-item custom-dropdown-item" href="about.html">Our Story</a></li>
+                            <li><a class="dropdown-item custom-dropdown-item" href="heritage.html">Nyonya Heritage</a>
+                            </li>
+                            <li><a class="dropdown-item custom-dropdown-item" href="artisans.html">Our Artisans</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link custom-navbar-link" href="menu.html">Our Kuih</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link custom-navbar-link dropdown-toggle" href="#" id="reviewsDropdown"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span>Reviews</span>
+                        </a>
+                        <ul class="dropdown-menu custom-dropdown-menu" aria-labelledby="reviewsDropdown">
+                            <li><a class="dropdown-item custom-dropdown-item" href="ratings.html">Submit a Review</a>
+                            </li>
+                            <li><a class="dropdown-item custom-dropdown-item" href="reviews.html">Customer Reviews</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link custom-navbar-link" href="contact.html">Contact &
+                            Locations</a></li>
+                    <li class="nav-item dropdown" id="account-dropdown">
+                        <a class="nav-link custom-navbar-link dropdown-toggle" href="#" id="accountDropdown"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span id="account-username">My Account</span>
+                            <i class="bi bi-person-circle" style="font-size: 1.2em; margin-left: 5px;"></i>
+                        </a>
+                        <ul class="dropdown-menu custom-dropdown-menu" aria-labelledby="accountDropdown"
+                            id="account-dropdown-menu">
+                            <!-- Content will be dynamically loaded by JS -->
+                        </ul>
+                    </li>
+                </ul>
+            </div>
 
-    </div>
+            <a class="btn-getstarted position-relative" href="checkout.html">
+                Checkout
+                <span id="cart-indicator"
+                    class="position-absolute top-0 start-100 translate-middle bg-danger border border-4 border-white shadow-sm d-flex align-items-center justify-content-center rounded-circle"
+                    style="display: none; width: 32px; height: 32px; font-size: 0.9rem;">
+                    0
+                </span>
+            </a>
+
+        </div>
+    </nav>
 </header>
+
+<style>
+    .header .navbar {
+        padding: 0 !important;
+        /* Remove default Bootstrap navbar padding */
+        background-color: transparent !important;
+        /* Ensure navbar itself doesn't have a background */
+    }
+
+    /* Logo Styling */
+    .header .navbar-brand.logo h1 {
+        font-size: 30px;
+        margin: 0;
+        font-weight: 700;
+        color: var(--heading-color);
+        font-family: var(--default-font);
+    }
+
+    .header .navbar-brand.logo .logo-dot {
+        /* Specific class for the dot */
+        color: var(--accent-color);
+        font-size: 36px;
+        /* Match original dot size */
+        line-height: 1;
+        /* Align with h1 */
+        margin-left: -2px;
+        /* Pull it slightly closer to the h1 */
+        font-weight: 700;
+        /* Match h1 boldness for visual consistency */
+    }
+
+    /* Main Navigation Links (Desktop) */
+    .custom-navbar-nav {
+        list-style: none;
+        /* Ensure no bullet points */
+        margin: 0;
+        padding: 0;
+    }
+
+    .custom-navbar-nav .nav-item {
+        white-space: nowrap;
+        /* Keep items on single line */
+        padding: 0 14px;
+        /* Horizontal spacing between main nav items */
+    }
+
+    .custom-navbar-nav .custom-navbar-link {
+        color: var(--nav-color);
+        font-size: 15px;
+        padding: 15px 2px;
+        /* Vertical padding + small horizontal for underline effect */
+        font-family: var(--nav-font);
+        font-weight: 500;
+        display: flex;
+        /* For icon alignment */
+        align-items: center;
+        /* justify-content: space-between; // Removed, dropdown-toggle handles caret */
+        transition: 0.3s;
+        position: relative;
+        /* For the custom underline effect */
+        text-transform: none;
+        /* Override any Bootstrap capitalization */
+    }
+
+    /* Custom Underline Effect for Main Nav Links */
+    .custom-navbar-nav .custom-navbar-link::before {
+        content: "";
+        position: absolute;
+        height: 2px;
+        bottom: -6px;
+        /* Position below the link */
+        left: 0;
+        background-color: var(--nav-hover-color);
+        visibility: hidden;
+        width: 0px;
+        transition: all 0.3s ease-in-out 0s;
+    }
+
+    .custom-navbar-nav .custom-navbar-link:hover::before,
+    .custom-navbar-nav .nav-item.show .custom-navbar-link::before,
+    /* For active dropdown parent */
+    .custom-navbar-nav .custom-navbar-link.active::before {
+        visibility: visible;
+        width: 100%;
+    }
+
+    .custom-navbar-nav .custom-navbar-link:hover,
+    .custom-navbar-nav .nav-item.show .custom-navbar-link,
+    /* For active dropdown parent */
+    .custom-navbar-nav .custom-navbar-link.active {
+        color: var(--nav-hover-color) !important;
+        /* Use !important to override Bootstrap .active */
+    }
+
+    /* Dropdown Caret Icon (Bootstrap's default) */
+    .custom-navbar-nav .dropdown-toggle::after {
+        margin-left: 5px;
+        /* Match original icon spacing */
+        font-size: 0.7em;
+        /* Make caret slightly smaller, similar to original bi-chevron-down */
+        vertical-align: middle;
+        /* Align caret vertically */
+        border: none;
+        /* Remove default Bootstrap border for caret */
+        content: "\F229";
+        /* Unicode for bi-chevron-down in Bootstrap Icons font */
+        font-family: "bootstrap-icons" !important;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        display: inline-block;
+    }
+
+    /* Custom Dropdown Menu Container */
+    .custom-dropdown-menu {
+        margin-top: 5px !important;
+        /* Adjust spacing from parent link */
+        padding: 10px 0 !important;
+        /* Vertical padding inside dropdown */
+        background: var(--nav-dropdown-background-color) !important;
+        border-radius: 4px !important;
+        box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.1) !important;
+        min-width: 200px !important;
+        /* Match original min-width */
+        z-index: 99;
+        border: none !important;
+        /* Remove Bootstrap's default border */
+    }
+
+    /* Custom Dropdown Item Links */
+    .custom-dropdown-menu .custom-dropdown-item {
+        padding: 10px 20px !important;
+        /* Padding for individual dropdown items */
+        font-size: 15px !important;
+        color: var(--nav-dropdown-color) !important;
+        text-transform: none !important;
+        background-color: transparent !important;
+        /* Ensure transparent background */
+    }
+
+    .custom-dropdown-menu .custom-dropdown-item:hover,
+    .custom-dropdown-menu .custom-dropdown-item.active {
+        color: var(--nav-dropdown-hover-color) !important;
+        background-color: transparent !important;
+        /* Keep background transparent or subtle hover */
+    }
+
+    /* Mobile Navigation Toggle (Hamburger Icon) */
+    .mobile-nav-toggler {
+        border: 0 !important;
+        /* Remove default Bootstrap button border */
+        padding: 0 !important;
+        /* Remove default Bootstrap button padding */
+        margin-right: 10px;
+        /* Match original margin */
+        line-height: 0;
+    }
+
+    .mobile-nav-toggler:focus {
+        box-shadow: none !important;
+        /* Remove focus outline */
+        outline: none !important;
+    }
+
+    .mobile-nav-toggler i {
+        color: var(--nav-color);
+        font-size: 28px;
+        /* Match original icon size */
+        transition: color 0.3s;
+    }
+
+    /* Mobile Menu Panel */
+    @media (max-width: 991.98px) {
+
+        /* Bootstrap's 'lg' breakpoint */
+        .header .navbar-collapse {
+            position: fixed;
+            inset: 60px 20px 20px 20px;
+            /* Match original inset positioning */
+            padding: 10px 0 !important;
+            /* Vertical padding inside the mobile menu panel */
+            background-color: var(--nav-mobile-background-color) !important;
+            border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%) !important;
+            border-radius: 6px;
+            box-shadow: none !important;
+            /* Remove any default Bootstrap shadow */
+            overflow-y: auto;
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Prevent flickering during Bootstrap's collapse transition */
+        .header .navbar-collapse.collapsing {
+            transition: none;
+        }
+
+        /* Adjust styles for nav links within the mobile menu */
+        .custom-navbar-nav .nav-item .custom-navbar-link {
+            padding: 10px 20px !important;
+            /* Adjust padding for mobile links */
+            font-size: 17px !important;
+            /* Adjust font size for mobile */
+            font-weight: 500 !important;
+            color: var(--nav-dropdown-color) !important;
+            /* Default mobile link color */
+            justify-content: flex-start;
+            /* Align text and caret to start */
+        }
+
+        .custom-navbar-nav .nav-item .custom-navbar-link::before {
+            display: none;
+            /* Hide underline effect on mobile */
+        }
+
+        .custom-navbar-nav .nav-item .custom-navbar-link:hover,
+        .custom-navbar-nav .nav-item .custom-navbar-link.active {
+            color: var(--nav-dropdown-hover-color) !important;
+            background-color: color-mix(in srgb, var(--accent-color), transparent 95%) !important;
+            /* Light highlight for active/hover mobile links */
+        }
+
+        /* Mobile Dropdown Styling (nested within the mobile menu panel) */
+        .custom-dropdown-menu {
+            position: static !important;
+            /* Make dropdowns static in mobile menu */
+            background-color: color-mix(in srgb, var(--default-color), transparent 97%) !important;
+            /* Slightly darker background for nested dropdowns */
+            box-shadow: none !important;
+            /* Remove shadow for nested dropdowns */
+            border: none !important;
+            /* Remove border for nested dropdowns */
+            width: auto !important;
+            min-width: unset !important;
+            margin: 10px 0 10px 20px !important;
+            /* Indent nested dropdowns */
+            padding: 0 !important;
+            border-radius: 0 !important;
+            /* Remove border radius for nested mobile dropdown */
+        }
+
+        .custom-dropdown-menu .custom-dropdown-item {
+            padding-left: 30px !important;
+            /* Further indent nested items */
+        }
+    }
+
+    /* Mobile Nav Overlay (Requires JS to add 'mobile-nav-active' and 'header-overlay' classes to <body>) */
+    body.mobile-nav-active.header-overlay::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: color-mix(in srgb, var(--default-color), transparent 20%);
+        /* Semi-transparent overlay */
+        z-index: 9996;
+        /* Below navbar, above page content */
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    /* Adjust the toggler button when mobile menu is active */
+    body.mobile-nav-active .mobile-nav-toggler {
+        color: #fff;
+        /* White icon when menu is open */
+        position: absolute;
+        /* Needed for top/right positioning */
+        font-size: 32px;
+        /* Larger 'X' icon */
+        top: 15px;
+        right: 15px;
+        margin-right: 0;
+        z-index: 9999;
+    }
+
+    body.mobile-nav-active .mobile-nav-toggler i {
+        color: #fff;
+        /* Explicitly white icon */
+    }
+</style>
