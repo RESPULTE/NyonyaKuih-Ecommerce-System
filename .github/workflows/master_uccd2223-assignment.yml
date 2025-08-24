@@ -21,7 +21,6 @@ jobs:
           node-version: '22.x'
 
       - name: npm install, build, and test
-        working-directory: "./FRONT END PROJECT"
         run: |
           npm install
           npm run build --if-present
@@ -31,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: "./FRONT END PROJECT"
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -60,4 +59,3 @@ jobs:
           app-name: 'uccd2223-assignment'
           slot-name: 'Production'
           package: .
-
