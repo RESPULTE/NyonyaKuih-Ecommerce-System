@@ -1,11 +1,25 @@
+name: Build and deploy Node.js app to Azure Web App - uccd2223-assignment
+
+on:
+  push:
+    branches:
+      - master # Triggers on push to the 'master' branch
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read #This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
+
+      # Removed Node.js setup and npm commands since it's a static site
+      # If you had client-side JS build steps (like Webpack for React/Vue),
+      # you would put 'npm install' and 'npm run build' here and
+      # adjust the 'path' in upload-artifact to point to the build output (e.g., 'dist').
+      # But for your current file structure, this is likely not needed.
 
       - name: Archive Web Content
         uses: actions/upload-artifact@v4
@@ -17,8 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write
-      contents: read
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download Web Content artifact
