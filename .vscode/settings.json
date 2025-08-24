@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/06b15c44-06bb-4291-a97e-e6f298ed9ee1/resourceGroups/UCCD2223-sthRg/providers/Microsoft.Web/sites/uccd2223-assignment",
+    "appService.deploySubpath": "."
+}
