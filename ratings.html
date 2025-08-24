@@ -1,0 +1,319 @@
+--- START OF FILE ratings.html ---
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Submit a Review - KuihTradisi</title>
+    <meta name="description"
+        content="Share your experience and rate your favorite Nyonya kuih from KuihTradisi. Your feedback helps us improve!">
+    <meta name="keywords"
+        content="Nyonya kuih review, customer rating, submit feedback, kuih experience, product rating">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Amatic+SC:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Main CSS File -->
+    <link href="assets/css/main.css" rel="stylesheet">
+
+    <style>
+        .ratings-page-section {
+            padding: 60px 0;
+            background-color: var(--background-color);
+        }
+
+        .rating-form-container {
+            background-color: var(--surface-color);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+        }
+
+        .rating-form-container h3 {
+            font-family: var(--heading-font);
+            color: var(--heading-color);
+            font-size: 2rem;
+            margin-bottom: 25px;
+            border-bottom: 2px solid color-mix(in srgb, var(--accent-color), transparent 70%);
+            padding-bottom: 10px;
+        }
+
+        .star-rating {
+            font-size: 2.5rem;
+            color: #ddd;
+            /* Default grey stars */
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .star-rating .bi-star-fill {
+            color: #ffc107;
+            /* Gold for filled stars */
+        }
+
+        .star-rating span {
+            margin-right: 5px;
+        }
+
+        .form-label {
+            font-family: var(--default-font);
+            font-weight: 500;
+            color: var(--default-color);
+            font-size: 1.05rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-color: color-mix(in srgb, var(--default-color), transparent 70%);
+            padding: 10px 15px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 70%);
+        }
+
+        .btn-submit-review {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: var(--contrast-color);
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-submit-review:hover {
+            background-color: color-mix(in srgb, var(--accent-color), black 10%);
+            border-color: color-mix(in srgb, var(--accent-color), black 10%);
+        }
+    </style>
+</head>
+
+<body class="ratings-page">
+
+    <!-- Navbar will be loaded here by JavaScript -->
+    <div id="navbar-placeholder"></div>
+
+    <main class="main">
+
+        <!-- Submit Review Section -->
+        <section id="submit-review" class="ratings-page-section">
+
+            <!-- Section Title -->
+            <div class="container section-title" data-aos="fade-up">
+                <h2>Customer Feedback</h2>
+                <p><span>Share Your</span> <span class="description-title">Kuih Experience</span></p>
+            </div><!-- End Section Title -->
+
+            <div class="container" data-aos="fade-up" data-aos-delay="100">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="rating-form-container">
+                            <h3>Submit Your Review</h3>
+                            <form id="reviewForm">
+                                <div class="mb-3">
+                                    <label for="reviewerName" class="form-label">Your Name <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="reviewerName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="productSelect" class="form-label">Which Kuih did you purchase? <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" id="productSelect" required>
+                                        <option value="">Select a Kuih</option>
+                                        <!-- Product options will be dynamically loaded here by JS -->
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Your Rating <span class="text-danger">*</span></label>
+                                    <div class="star-rating" id="starRating">
+                                        <span data-rating="1"><i class="bi bi-star"></i></span>
+                                        <span data-rating="2"><i class="bi bi-star"></i></span>
+                                        <span data-rating="3"><i class="bi bi-star"></i></span>
+                                        <span data-rating="4"><i class="bi bi-star"></i></span>
+                                        <span data-rating="5"><i class="bi bi-star"></i></span>
+                                    </div>
+                                    <input type="hidden" id="selectedRating" name="rating" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="reviewComment" class="form-label">Your Comments <span
+                                            class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="reviewComment" rows="5"
+                                        placeholder="Tell us about your experience..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-submit-review">Submit Review</button>
+                                <div id="reviewMessage" class="mt-3 text-center" style="display: none;"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section><!-- /Submit Review Section -->
+
+    </main>
+
+    <!-- Footer will be loaded here by JavaScript -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Preloader -->
+    <div id="preloader"></div>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <!-- Include jQuery before main.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+    <script>
+        // Inline script for star rating functionality on this page
+        document.addEventListener('DOMContentLoaded', function () {
+            const starRatingContainer = document.getElementById('starRating');
+            const selectedRatingInput = document.getElementById('selectedRating');
+            let currentRating = 0;
+
+            starRatingContainer.addEventListener('mouseover', function (e) {
+                const target = e.target.closest('span');
+                if (!target) return;
+
+                const rating = parseInt(target.dataset.rating);
+                highlightStars(rating);
+            });
+
+            starRatingContainer.addEventListener('mouseout', function () {
+                highlightStars(currentRating);
+            });
+
+            starRatingContainer.addEventListener('click', function (e) {
+                const target = e.target.closest('span');
+                if (!target) return;
+
+                currentRating = parseInt(target.dataset.rating);
+                selectedRatingInput.value = currentRating;
+                highlightStars(currentRating);
+            });
+
+            function highlightStars(rating) {
+                starRatingContainer.querySelectorAll('span').forEach((starSpan, index) => {
+                    const starIcon = starSpan.querySelector('i');
+                    if (index < rating) {
+                        starIcon.classList.remove('bi-star');
+                        starIcon.classList.add('bi-star-fill');
+                    } else {
+                        starIcon.classList.remove('bi-star-fill');
+                        starIcon.classList.add('bi-star');
+                    }
+                });
+            }
+
+            // Populate product dropdown with dummy data (or fetch from a JSON file/API)
+            const productSelect = document.getElementById('productSelect');
+            const dummyProducts = [
+                "Kuih Lapis", "Onde-Onde", "Ang Koo Kuih", "Seri Muka", "Kuih Talam", "Yam Cake",
+                "Karipap Pusing", "Pulut Panggang", "Kuih Bakar Berlauk", "Kuih Koci", "Pulut Tai Tai",
+                "Assorted Kuih Platter (Small)", "Festive Kuih Set"
+            ];
+            dummyProducts.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product;
+                option.textContent = product;
+                productSelect.appendChild(option);
+            });
+
+            // Handle review submission
+            const reviewForm = document.getElementById('reviewForm');
+            const reviewMessage = document.getElementById('reviewMessage');
+            reviewForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const reviewerName = document.getElementById('reviewerName').value;
+                const productName = productSelect.value;
+                const rating = parseInt(selectedRatingInput.value);
+                const comment = document.getElementById('reviewComment').value;
+
+                if (!reviewerName || !productName || !rating || !comment) {
+                    reviewMessage.textContent = "Please fill in all required fields.";
+                    reviewMessage.className = "mt-3 text-center text-danger";
+                    reviewMessage.style.display = "block";
+                    return;
+                }
+
+                // Call the global saveReview function from main.js
+                // It now returns a Promise/Deferred object
+                if (typeof window.saveReview === 'function') {
+                    const newReview = {
+                        id: Date.now(),
+                        name: reviewerName,
+                        product: productName,
+                        rating: rating,
+                        comment: comment,
+                        date: new Date().toLocaleDateString('en-MY', { year: 'numeric', month: 'long', day: 'numeric' })
+                    };
+                    window.saveReview(newReview)
+                        .done(response => {
+                            reviewMessage.textContent = response.message || "Thank you for your review! It has been submitted.";
+                            reviewMessage.className = "mt-3 text-center text-success";
+                            reviewMessage.style.display = "block";
+                            reviewForm.reset();
+                            currentRating = 0;
+                            highlightStars(0);
+                        })
+                        .fail(error => {
+                            reviewMessage.textContent = error.message || "Failed to submit review. Please try again.";
+                            reviewMessage.className = "mt-3 text-center text-danger";
+                            reviewMessage.style.display = "block";
+                            console.error("Review submission failed:", error);
+                        });
+                } else {
+                    reviewMessage.textContent = "Error: Review saving function not available.";
+                    reviewMessage.className = "mt-3 text-center text-danger";
+                    reviewMessage.style.display = "block";
+                    console.error("saveReview function not found in global scope.");
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

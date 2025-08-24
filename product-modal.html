@@ -1,0 +1,114 @@
+<!-- Modal structure for product details -->
+<div class="modal fade" id="productQuickViewModal" tabindex="-1" aria-labelledby="productQuickViewModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productQuickViewModalLabel">Product Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6 text-center">
+                            <img id="modal-product-image" src="" class="img-fluid rounded" alt="Product Image">
+                        </div>
+                        <div class="col-md-6">
+                            <h3 id="modal-product-name" class="modal-product-title"></h3>
+                            <p class="modal-product-price fs-4 fw-bold text-success"></p>
+
+                            <hr>
+
+                            <div class="modal-product-description mb-3">
+                                <p class="mb-1"><strong>Ingredients:</strong> <span
+                                        id="modal-product-ingredients"></span></p>
+                                <p class="mb-1"><strong>Allergens:</strong> <span id="modal-product-allergens"
+                                        class="text-danger"></span></p>
+                            </div>
+
+                            <hr>
+
+                            <div class="modal-product-options mb-3">
+                                <form id="add-to-cart-form">
+                                    <div class="mb-3">
+                                        <label for="modal-packaging-select" class="form-label fw-bold">Select
+                                            Packaging:</label>
+                                        <select class="form-select" id="modal-packaging-select">
+                                            <!-- Options will be dynamically loaded here -->
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="modal-quantity" class="form-label fw-bold">Quantity:</label>
+                                        <input type="number" id="modal-quantity" class="form-control" value="1" min="1"
+                                            max="100">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-lg w-100">Add to Cart</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom styles for the modal */
+    #productQuickViewModal .modal-product-title {
+        color: var(--heading-color);
+        font-family: var(--heading-font);
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+    }
+
+    #productQuickViewModal .modal-product-price {
+        color: var(--accent-color);
+    }
+
+    #productQuickViewModal .modal-body img {
+        max-height: 400px;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+    #productQuickViewModal .form-label {
+        font-family: var(--default-font);
+    }
+
+    #productQuickViewModal .btn-primary {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    #productQuickViewModal .btn-primary:hover {
+        background-color: color-mix(in srgb, var(--accent-color), black 10%);
+        border-color: color-mix(in srgb, var(--accent-color), black 10%);
+    }
+
+    #productQuickViewModal .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    #productQuickViewModal .btn-secondary:hover {
+        background-color: color-mix(in srgb, #6c757d, black 10%);
+        border-color: color-mix(in srgb, #6c757d, black 10%);
+    }
+
+    #modal-product-ingredients,
+    #modal-product-allergens {
+        font-family: var(--default-font);
+        font-weight: 400;
+        color: var(--default-color);
+    }
+
+    #modal-product-allergens.text-danger {
+        color: #dc3545 !important;
+        /* Ensure red for allergens */
+    }
+</style>

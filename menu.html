@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Our Kuih - KuihTradisi</title>
+    <meta name="description"
+        content="Explore our exquisite collection of authentic Nyonya kuih, handcrafted with traditional recipes and the freshest ingredients.">
+    <meta name="keywords"
+        content="Nyonya kuih, Malaysian desserts, traditional snacks, sweet kuih, savory kuih, classic kuih, online kuih, handcrafted, delivery">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Amatic+SC:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Main CSS File -->
+    <link href="assets/css/main.css" rel="stylesheet">
+
+    <style>
+        /* Custom styles for search bar */
+        .search-bar-container {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .search-bar-container .form-control {
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 50px;
+            padding: 12px 25px;
+            border: 2px solid color-mix(in srgb, var(--default-color), transparent 70%);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background-color: var(--surface-color);
+            /* Matches theme */
+            color: var(--default-color);
+            /* Matches theme */
+        }
+
+        .search-bar-container .form-control::placeholder {
+            color: color-mix(in srgb, var(--default-color), transparent 50%);
+            /* Matches theme */
+        }
+
+        .search-bar-container .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 70%);
+            background-color: var(--surface-color);
+            /* Ensure consistent background on focus */
+            color: var(--default-color);
+            /* Ensure consistent text color on focus */
+        }
+
+        .no-results-message {
+            font-family: var(--default-font);
+            font-size: 1.2rem;
+            color: color-mix(in srgb, var(--default-color), transparent 30%);
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .menu-img {
+            width: 100%;
+            /* makes it fill column width */
+            height: 250px;
+            /* fixed height (adjust as you like) */
+            object-fit: cover;
+            /* crop image to fill box without distortion */
+            border-radius: 10px;
+            /* optional: rounded corners */
+        }
+    </style>
+</head>
+
+<body class="menu-page">
+
+    <!-- Navbar will be loaded here by JavaScript -->
+    <div id="navbar-placeholder"></div>
+
+    <main class="main">
+
+        <!-- Menu Section -->
+        <section id="menu" class="menu section">
+
+            <!-- Section Title -->
+            <div class="container section-title" data-aos="fade-up">
+                <h2>Our Collection</h2>
+                <p><span>Discover Our</span> <span class="description-title">Authentic Nyonya Kuih</span></p>
+            </div><!-- End Section Title -->
+
+            <!-- Search Bar -->
+            <div class="container search-bar-container" data-aos="fade-up" data-aos-delay="150">
+                <input type="text" class="form-control" id="kuihSearchInput"
+                    placeholder="Search for your favorite kuih...">
+            </div><!-- End Search Bar -->
+
+            <div class="container">
+
+                <ul class="nav nav-tabs d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
+
+                    <li class="nav-item">
+                        <a class="nav-link active show" data-bs-toggle="tab" data-bs-target="#kuih-manis">
+                            <h4>Kuih Manis</h4>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#kuih-savory">
+                            <h4>Kuih Savory</h4>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#special-collections">
+                            <h4>Special Collections</h4>
+                        </a>
+                    </li>
+
+                </ul>
+
+                <div class="tab-content" id="kuihTabContent" data-aos="fade-up" data-aos-delay="200">
+                    <!-- No Results Message (initially hidden) -->
+                    <div id="noResultsMessage" class="no-results-message" style="display: none;">No kuih found matching
+                        your search.</div>
+
+                    <!-- Kuih Manis (Sweet Delights) Tab Content -->
+                    <div class="tab-pane fade active show" id="kuih-manis">
+                        <div class="tab-header text-center">
+                            <p>Our Selection</p>
+                            <h3>Sweet Delights (Kuih Manis)</h3>
+                        </div>
+                        <div class="row gy-5">
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal" data-image="assets/img/menu/Kuih-lapis.jpg"
+                                    data-name="Kuih Lapis" data-base-price="8.00"
+                                    data-ingredients="Rice flour, coconut milk, sugar, pandan juice, food coloring"
+                                    data-allergens="Coconut"
+                                    data-packaging='[{"option":"2 pcs/pkt","price":8.00},{"option":"10 pcs/pkt","price":35.00}]'>
+                                    <img src="assets/img/menu/Kuih-lapis.jpg" class="menu-img img-fluid"
+                                        alt="Kuih Lapis">
+                                    <h4>Kuih Lapis</h4>
+                                    <p class="ingredients">
+                                        Layered steamed cake with coconut milk, pandan, and natural colors
+                                    </p>
+                                    <p class="price">
+                                        RM 8.00
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal" data-image="assets/img/menu/Onde-Onde.jpg"
+                                    data-name="Onde-Onde" data-base-price="6.00"
+                                    data-ingredients="Glutinous rice flour, Gula Melaka, grated coconut, pandan leaves"
+                                    data-allergens="Coconut"
+                                    data-packaging='[{"option":"5 pcs/pkt","price":6.00},{"option":"20 pcs/pkt","price":22.00}]'>
+                                    <img src="assets/img/menu/Onde-Onde.jpg" class="menu-img img-fluid" alt="Onde-Onde">
+                                    <h4>Onde-Onde</h4>
+                                    <p class="ingredients">
+                                        Glutinous rice balls filled with molten Gula Melaka, coated in fresh coconut
+                                    </p>
+                                    <p class="price">
+                                        RM 6.00
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal"
+                                    data-image="assets/img/menu/Ang-Koo-Kuih.jpg" data-name="Ang Koo Kuih"
+                                    data-base-price="7.50"
+                                    data-ingredients="Glutinous rice flour, sweet mung bean paste, banana leaf, food coloring"
+                                    data-allergens="None"
+                                    data-packaging='[{"option":"3 pcs/pkt","price":7.50},{"option":"12 pcs/pkt","price":28.00}]'>
+                                    <img src="assets/img/menu/Ang-Koo-Kuih.jpg" class="menu-img img-fluid"
+                                        alt="Ang Koo Kuih">
+                                    <h4>Ang Koo Kuih</h4>
+                                    <p class="ingredients">
+                                        Used for ceremonial purposes, with a sweet custard filling
+                                    </p>
+                                    <p class="price">
+                                        RM 7.50
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal" data-image="assets/img/menu/seri-muka.jpg"
+                                    data-name="Seri Muka" data-base-price="7.00"
+                                    data-ingredients="Glutinous rice, coconut milk, pandan juice, sugar, rice flour"
+                                    data-allergens="Coconut"
+                                    data-packaging='[{"option":"2 pcs/pkt","price":7.00},{"option":"8 pcs/pkt","price":26.00}]'>
+                                    <img src="assets/img/menu/seri-muka.jpg" class="menu-img img-fluid" alt="Seri Muka">
+                                    <h4>Seri Muka</h4>
+                                    <p class="ingredients">
+                                        Two-layered kuih with rich pandan custard top and steamed glutinous rice base
+                                    </p>
+                                    <p class="price">
+                                        RM 7.00
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal" data-image="assets/img/menu/kuih-talam.jpg"
+                                    data-name="Kuih Talam" data-base-price="6.50"
+                                    data-ingredients="Rice flour, sago flour, coconut milk, pandan juice, sugar, salt"
+                                    data-allergens="Coconut"
+                                    data-packaging='[{"option":"2 pcs/pkt","price":6.50},{"option":"8 pcs/pkt","price":24.00}]'>
+                                    <img src="assets/img/menu/kuih-talam.jpg" class="menu-img img-fluid"
+                                        alt="Kuih Talam">
+                                    <h4>Kuih Talam</h4>
+                                    <p class="ingredients">
+                                        Soft, two-toned steamed cake with a savory white coconut layer and sweet green
+                                        pandan layer
+                                    </p>
+                                    <p class="price">
+                                        RM 6.50
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal" data-image="assets/img/menu/Yam-cake.jpg"
+                                    data-name="Yam Cake" data-base-price="9.00"
+                                    data-ingredients="Yam, rice flour, dried shrimp, mushrooms, fried shallots"
+                                    data-allergens="Dried shrimp, gluten"
+                                    data-packaging='[{"option":"2 pcs/pkt","price":9.00},{"option":"6 pcs/pkt","price":25.00}]'>
+                                    <img src="assets/img/menu/Yam-cake.jpg" class="menu-img img-fluid" alt="Yam Cake">
+                                    <h4>Yam Cake</h4>
+                                    <p class="ingredients">
+                                        Baked using yam, made of yam, is a cake
+                                    </p>
+                                    <p class="price">
+                                        RM 9.00
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                        </div>
+                    </div><!-- End Kuih Manis Tab Content -->
+
+                    <!-- Kuih Savory Tab Content -->
+                    <div class="tab-pane fade" id="kuih-savory">
+
+                        <div class="tab-header text-center">
+                            <p>Our Selection</p>
+                            <h3>Savory Bites (Kuih Savory)</h3>
+                        </div>
+
+                        <div class="row gy-5">
+
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal"
+                                    data-image="assets/img/menu/karipap-pusing.png" data-name="Karipap Pusing"
+                                    data-base-price="4.00"
+                                    data-ingredients="Wheat flour, potatoes, chicken, curry powder, spices"
+                                    data-allergens="Gluten"
+                                    data-packaging='[{"option":"2 pcs/pkt","price":4.00},{"option":"6 pcs/pkt","price":18.00}]'>
+                                    <img src="assets/img/menu/karipap-pusing.png" class="menu-img img-fluid"
+                                        alt="Karipap Pusing">
+                                    <h4>Karipap Pusing</h4>
+                                    <p class="ingredients">
+                                        Flaky spiral curry puff filled with spiced potatoes and chicken
+                                    </p>
+                                    <p class="price">
+                                        RM 4.00
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal"
+                                    data-image="assets/img/menu/pulut-panggang.png" data-name="Pulut Panggang"
+                                    data-base-price="5.50"
+                                    data-ingredients="Glutinous rice, dried shrimp sambal, coconut milk, banana leaf"
+                                    data-allergens="Shellfish, coconut"
+                                    data-packaging='[{"option":"2 pcs/pkt","price":5.50},{"option":"8 pcs/pkt","price":20.00}]'>
+                                    <img src="assets/img/menu/pulut-panggang.png" class="menu-img img-fluid"
+                                        alt="Pulut Panggang">
+                                    <h4>Pulut Panggang</h4>
+                                    <p class="ingredients">
+                                        Grilled glutinous rice with spicy dried shrimp sambal, wrapped in banana leaf
+                                    </p>
+                                    <p class="price">
+                                        RM 5.50
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal"
+                                    data-image="assets/img/menu/kuih-bakar-berlauk.png" data-name="Kuih Bakar Berlauk"
+                                    data-base-price="6.00"
+                                    data-ingredients="Flour, eggs, coconut milk, minced chicken, spices, green chilies"
+                                    data-allergens="Eggs, coconut"
+                                    data-packaging='[{"option":"1 pc","price":6.00},{"option":"4 pcs/pkt","price":22.00}]'>
+                                    <img src="assets/img/menu/kuih-bakar-berlauk.png" class="menu-img img-fluid"
+                                        alt="Kuih Bakar Berlauk">
+                                    <h4>Kuih Bakar Berlauk</h4>
+                                    <p class="ingredients">
+                                        Baked savory kuih topped with spiced minced meat, often chicken or beef
+                                    </p>
+                                    <p class="price">
+                                        RM 6.00
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                        </div>
+                    </div><!-- End Kuih Savory Tab Content -->
+
+
+
+                    <!-- Special Collections Tab Content -->
+                    <div class="tab-pane fade" id="special-collections">
+
+                        <div class="tab-header text-center">
+                            <p>Our Selection</p>
+                            <h3>Party Packs & Seasonal Delights</h3>
+                        </div>
+
+                        <div class="row gy-5">
+
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal" data-image="assets/img/menu/small-box.png"
+                                    data-name="Assorted Kuih Platter (Small)" data-base-price="35.00"
+                                    data-ingredients="Assortment of selected kuih (see individual kuih for ingredients)"
+                                    data-allergens="May contain coconut, gluten, eggs, nuts"
+                                    data-packaging='[{"option":"Small (10 pcs)","price":35.00},{"option":"Medium (20 pcs)","price":65.00}]'>
+                                    <img src="assets/img/menu/small-box.png" class="menu-img img-fluid"
+                                        alt="Assorted Kuih Platter">
+                                    <h4>Assorted Kuih Platter (Small)</h4>
+                                    <p class="ingredients">
+                                        A curated selection of 10 classic sweet and savory Nyonya kuih
+                                    </p>
+                                    <p class="price">
+                                        RM 35.00
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                            <div class="col-lg-4 menu-item">
+                                <a href="#" class="product-link" data-bs-toggle="modal"
+                                    data-bs-target="#productQuickViewModal" data-image="assets/img/menu/festive-set.png"
+                                    data-name="Festive Kuih Set" data-base-price="60.00"
+                                    data-ingredients="Seasonal kuih collection (see individual kuih for ingredients)"
+                                    data-allergens="Varies by season, may contain coconut, gluten, eggs, nuts"
+                                    data-packaging='[{"option":"Standard Set","price":60.00},{"option":"Deluxe Set","price":90.00}]'>
+                                    <img src="assets/img/menu/festive-set.png" class="menu-img img-fluid"
+                                        alt="Festive Kuih Set">
+                                    <h4>Festive Kuih Set</h4>
+                                    <p class="ingredients">
+                                        Seasonal kuih collection perfect for celebrations (e.g., CNY, Hari Raya)
+                                    </p>
+                                    <p class="price">
+                                        RM 60.00
+                                    </p>
+                                </a>
+                            </div><!-- Kuih Item -->
+
+                        </div>
+                    </div><!-- End Special Collections Tab Content -->
+
+                </div>
+
+            </div>
+
+        </section><!-- /Menu Section -->
+
+    </main>
+
+    <!-- Footer will be loaded here by JavaScript -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Product Quick View Modal Placeholder -->
+    <div id="product-modal-placeholder"></div>
+
+    <!-- Preloader -->
+    <div id="preloader"></div>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
