@@ -160,6 +160,22 @@
         }
 
         /* Reset margin from previous structure */
+
+        /* Styles for form messages */
+        .php-email-form .loading {
+            color: var(--default-color);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .php-email-form .error-message {
+            background: #ed3c0d;
+            color: #fff;
+        }
+
+        .php-email-form .sent-message {
+            background: #20995c;
+            color: #fff;
+        }
     </style>
 </head>
 
@@ -170,7 +186,7 @@
 
     <main class="main">
 
-        <!-- Where to Buy Section (Moved to top) -->
+        <!-- Where to Buy Section -->
         <section id="where-to-buy" class="where-to-buy section light-background">
 
             <!-- Section Title -->
@@ -365,37 +381,32 @@
 
                 </div>
 
-                <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up"
-                    data-aos-delay="600">
+                <!-- Formspree Integration for AJAX Contact Form -->
+                <!-- <form id="contactForm" action="https://formspree.io/f/YOUR_FORMSPREE_CODE" method="POST"
+                    class="php-email-form" data-aos="fade-up" data-aos-delay="600">
                     <div class="row gy-4">
-
                         <div class="col-md-6">
                             <input type="text" name="name" class="form-control" placeholder="Your Name" required>
                         </div>
-
                         <div class="col-md-6 ">
                             <input type="email" class="form-control" name="email" placeholder="Your Email" required>
                         </div>
-
                         <div class="col-md-12">
                             <input type="text" class="form-control" name="subject" placeholder="Subject" required>
                         </div>
-
                         <div class="col-md-12">
                             <textarea class="form-control" name="message" rows="6" placeholder="Message"
                                 required></textarea>
                         </div>
-
                         <div class="col-md-12 text-center">
-                            <div class="loading">Loading</div>
-                            <div class="error-message"></div>
-                            <div class="sent-message">Your message has been sent. Thank you!</div>
-
-                            <button type="submit">Send Message</button>
+                            <div class="loading" style="display: none;">Sending...</div>
+                            <div class="error-message" style="display: none;"></div>
+                            <div class="sent-message" style="display: none;">Your message has been sent. Thank you!
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send Message</button>
                         </div>
-
                     </div>
-                </form><!-- End Contact Form -->
+                </form>End Contact Form -->
 
             </div>
 
@@ -411,15 +422,71 @@
 
     <!-- Vendor JS Files -->
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/php-email-form/validate.js"></script>
     <script src="assets/vendor/aos/aos.js"></script>
     <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
     <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
     <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- jQuery is needed for the AJAX form submission -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
+
+    <!-- <script>
+        // JavaScript for payment method selection visual effect (from checkout.html, keep if needed here)
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     document.querySelectorAll('.payment-option').forEach(option => {
+        //         option.addEventListener('click', function () {
+        //             document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+        //             this.classList.add('selected');
+        //             this.querySelector('input[type="radio"]').checked = true;
+        //         });
+        //     });
+        // });
+
+        // Inline script for Contact Form AJAX submission using jQuery
+        $(document).ready(function () {
+            $('#contactForm').submit(function (e) {
+                e.preventDefault(); // Prevent default form submission
+
+                const $form = $(this);
+                const $loading = $form.find('.loading');
+                const $error = $form.find('.error-message');
+                const $sent = $form.find('.sent-message');
+                const formData = $form.serializeArray(); // Serialize form data
+
+                $loading.show();
+                $error.hide();
+                $sent.hide();
+
+                // Replace 'https://formspree.io/f/YOUR_FORMSPREE_CODE' with your actual Formspree endpoint
+                // Get your endpoint from Formspree after setting up a new form.
+                // Example: https://formspree.io/f/xvovprja (this is a dummy)
+                $.ajax({
+                    url: $form.attr('action'), // Use the action attribute from the form
+                    method: 'POST',
+                    data: formData,
+                    dataType: 'json', // Formspree expects JSON response
+                    success: function (response) {
+                        $loading.hide();
+                        if (response.ok) {
+                            $sent.html('Your message has been sent. Thank you!').show();
+                            $form[0].reset(); // Clear the form
+                        } else {
+                            // Formspree returns { "ok": false, "error": "..." } on failure
+                            $error.html('Oops! There was an error sending your message: ' + (response.error || 'Unknown error')).show();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $loading.hide();
+                        $error.html('Failed to send message. Please try again later.').show();
+                        console.error("AJAX Error:", status, error, xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script> -->
 
 </body>
 
