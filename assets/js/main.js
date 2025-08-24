@@ -237,7 +237,7 @@ const updateCartIndicator = () => {
     accountDropdownMenu.innerHTML = '';
     if (currentUserId === DEFAULT_USER_ID) {
       accountUsernameSpan.textContent = 'My Account';
-      accountDropdownMenu.innerHTML = `<li><a href="login.html">Login</a></li><li><a href="register.html">Register</a></li>`;
+      accountDropdownMenu.innerHTML = `<li><a href="login.html" class="dropdown-item custom-dropdown-item">Login</a></li><li><a href="register.html" class="dropdown-item custom-dropdown-item">Register</a></li>`;
     } else {
       const currentUser = _getRawData('kuihTradisiUsers').find(user => user.id === currentUserId);
       accountUsernameSpan.textContent = currentUser ? `Welcome, ${currentUser.displayName}` : 'My Account';
