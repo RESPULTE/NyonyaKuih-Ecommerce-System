@@ -1,14 +1,14 @@
 // Inline script to populate reviews on this page
 document.addEventListener('DOMContentLoaded', function () {
     // This function is now exposed globally for main.js to call if the page class matches
-    window.initializeReviewsPage = () => {
-        const reviewsListContainer = $('#reviews-list'); // Using jQuery as it's common in this project
-        if (!reviewsListContainer.length) return;
+            window.initializeReviewsPage = () => {
+            const reviewsListContainer = $('#reviews-list');
+            if (!reviewsListContainer.length) return;
 
-        window.getReviews().done(storedReviews => { // Global function from main.js
-            if (storedReviews.length > 0) {
-                reviewsListContainer.empty(); // Clear "No reviews yet" message
-                storedReviews.reverse().forEach(review => { // Display newest first
+            window.getReviews().done(storedReviews => { // This will now fetch from MockAPI first!
+                if (storedReviews.length > 0) {
+                    reviewsListContainer.empty(); // Clear "No reviews yet" message
+                    storedReviews.reverse().forEach(review => { // Display newest first
                     const starsHtml = Array(review.rating).fill('<i class="bi bi-star-fill"></i>').join('') +
                         Array(5 - review.rating).fill('<i class="bi bi-star"></i>').join('');
 
@@ -27,14 +27,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `);
                 });
-            } else {
-                reviewsListContainer.html('<p class="text-center no-reviews-message">No reviews yet. Be the first to share your experience!</p>');
-            }
-        }).fail(error => {
-            console.error("Error populating reviews page:", error.message);
-            reviewsListContainer.html(`<p class="text-center text-danger">Failed to load reviews: ${error.message}</p>`);
-        });
-    };
+                } else {
+                    reviewsListContainer.html('<p class="text-center no-reviews-message">No reviews yet. Be the first to share your experience!</p>');
+                }
+            }).fail(error => {
+                console.error("Error populating reviews page:", error.message);
+                reviewsListContainer.html(`<p class="text-center text-danger">Failed to load reviews: ${error.message}</p>`);
+            });
+        };
+    
+
 
     // Call initial population. main.js will now call window.initializeReviewsPage() after loading dynamic content.
 });

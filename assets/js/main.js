@@ -10,6 +10,7 @@
   window.selectHeader = null; // Made global
   window.scrollTopBtn = null; // Made global
   window.productQuickViewModal = null; // Bootstrap Modal instance - Made global for menu.html
+  const REVIEWS_MOCK_API_URL = 'https://68ac62797a0bbe92cbba425d.mockapi.io/reviews'; // <--- NEW CONSTANT
 
   const SHIPPING_FLAT_RATE = 10.00; // Example shipping rate (constant, can remain local to main.js if only used internally)
 
@@ -212,12 +213,46 @@ window.deleteCartItem = (itemId) => {
   // --- REVIEWS MANAGEMENT ---
   // These functions are exposed globally via the `window` object for page-specific scripts to call.
 
-  window.getReviews = () => $.Deferred().resolve(_getRawData('kuihTradisiReviews')).promise();
+    window.getReviews = () => {
+      // For getting reviews, we should now attempt to fetch from MockAPI first
+      return $.getJSON(REVIEWS_MOCK_API_URL)
+          .done(apiReviews => {
+              // Optionally, update local storage with fetched data for offline capability/cache
+              _saveRawData('kuihTradisiReviews', apiReviews);
+              console.log("Reviews fetched from MockAPI and updated local storage.");
+          })
+          .fail((xhr, status, error) => {
+              console.warn("Failed to fetch reviews from MockAPI, falling back to local storage.", status, error);
+              // Fallback to local storage if API call fails
+              return $.Deferred().resolve(_getRawData('kuihTradisiReviews')).promise();
+          });
+  };
+  
   window.saveReview = (review) => {
-    const reviews = _getRawData('kuihTradisiReviews');
-    reviews.push(review);
-    _saveRawData('kuihTradisiReviews', reviews);
-    return $.Deferred().resolve({ success: true, message: 'Review submitted.' }).promise();
+    // Return the Deferred object from the AJAX call directly
+    return $.post(REVIEWS_MOCK_API_URL, review, 'json')
+        .done(response => {
+            console.log('Review submitted successfully to MockAPI:', response);
+            // Optionally, refresh local storage reviews to include the newly added one
+            // This is crucial for `getReviews` to pick it up without a full page reload if it also reads from API
+            // Or, you can just push it to the current local cache
+            const reviews = _getRawData('kuihTradisiReviews');
+            reviews.push(response); // Use the response from MockAPI, as it might have an 'id'
+            _saveRawData('kuihTradisiReviews', reviews);
+            console.log("Local storage reviews updated with new API review.");
+            return $.Deferred().resolve({ success: true, message: 'Review submitted.', data: response }).promise();
+        })
+        .fail((xhr, status, error) => {
+            console.error('Error submitting review to MockAPI:', status, error, xhr.responseText);
+            let errorMessage = 'Failed to submit review. Please try again.';
+            try {
+                const errorResponse = JSON.parse(xhr.responseText);
+                errorMessage = errorResponse.message || errorMessage;
+            } catch (e) {
+                // ignore parsing error
+            }
+            return $.Deferred().reject({ success: false, message: errorMessage }).promise();
+        });
   };
 
   // --- Global UI Updates ---
