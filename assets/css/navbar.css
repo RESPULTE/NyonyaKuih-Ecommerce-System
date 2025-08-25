@@ -1,0 +1,262 @@
+.header .navbar {
+    padding: 0 !important;
+    /* Remove default Bootstrap navbar padding */
+    background-color: transparent !important;
+    /* Ensure navbar itself doesn't have a background */
+}
+
+/* Logo Styling */
+.header .navbar-brand.logo h1 {
+    font-size: 30px;
+    margin: 0;
+    font-weight: 700;
+    color: var(--heading-color);
+    font-family: var(--default-font);
+}
+
+.header .navbar-brand.logo .logo-dot {
+    /* Specific class for the dot */
+    color: var(--accent-color);
+    font-size: 36px;
+    /* Match original dot size */
+    line-height: 1;
+    /* Align with h1 */
+    margin-left: -2px;
+    /* Pull it slightly closer to the h1 */
+    font-weight: 700;
+    /* Match h1 boldness for visual consistency */
+}
+
+/* Main Navigation Links (Desktop) */
+.custom-navbar-nav {
+    list-style: none;
+    /* Ensure no bullet points */
+    margin: 0;
+    padding: 0;
+}
+
+.custom-navbar-nav .nav-item {
+    white-space: nowrap;
+    /* Keep items on single line */
+    padding: 0 14px;
+    /* Horizontal spacing between main nav items */
+}
+
+.custom-navbar-nav .custom-navbar-link {
+    color: var(--nav-color);
+    font-size: 15px;
+    padding: 15px 2px;
+    /* Vertical padding + small horizontal for underline effect */
+    font-family: var(--nav-font);
+    font-weight: 500;
+    display: flex;
+    /* For icon alignment */
+    align-items: center;
+    /* justify-content: space-between; // Removed, dropdown-toggle handles caret */
+    transition: 0.3s;
+    position: relative;
+    /* For the custom underline effect */
+    text-transform: none;
+    /* Override any Bootstrap capitalization */
+}
+
+/* Custom Underline Effect for Main Nav Links */
+.custom-navbar-nav .custom-navbar-link::before {
+    content: "";
+    position: absolute;
+    height: 2px;
+    bottom: -6px;
+    /* Position below the link */
+    left: 0;
+    background-color: var(--nav-hover-color);
+    visibility: hidden;
+    width: 0px;
+    transition: all 0.3s ease-in-out 0s;
+}
+
+.custom-navbar-nav .custom-navbar-link:hover::before,
+.custom-navbar-nav .nav-item.show .custom-navbar-link::before,
+/* For active dropdown parent */
+.custom-navbar-nav .custom-navbar-link.active::before {
+    visibility: visible;
+    width: 100%;
+}
+
+.custom-navbar-nav .custom-navbar-link:hover,
+.custom-navbar-nav .nav-item.show .custom-navbar-link,
+/* For active dropdown parent */
+.custom-navbar-nav .custom-navbar-link.active {
+    color: var(--nav-hover-color) !important;
+    /* Use !important to override Bootstrap .active */
+}
+
+/* Dropdown Caret Icon (Bootstrap's default) */
+.custom-navbar-nav .dropdown-toggle::after {
+    margin-left: 5px;
+    /* Match original icon spacing */
+    font-size: 0.7em;
+    /* Make caret slightly smaller, similar to original bi-chevron-down */
+    vertical-align: middle;
+    /* Align caret vertically */
+    border: none;
+    /* Remove default Bootstrap border for caret */
+    content: "\F229";
+    /* Unicode for bi-chevron-down in Bootstrap Icons font */
+    font-family: "bootstrap-icons" !important;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+}
+
+/* Custom Dropdown Menu Container */
+.custom-dropdown-menu {
+    margin-top: 5px !important;
+    /* Adjust spacing from parent link */
+    padding: 10px 0 !important;
+    /* Vertical padding inside dropdown */
+    background: var(--nav-dropdown-background-color) !important;
+    border-radius: 4px !important;
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.1) !important;
+    min-width: 200px !important;
+    /* Match original min-width */
+    z-index: 99;
+    border: none !important;
+    /* Remove Bootstrap's default border */
+}
+
+/* Custom Dropdown Item Links */
+.custom-dropdown-menu .custom-dropdown-item {
+    padding: 10px 20px !important;
+    /* Padding for individual dropdown items */
+    font-size: 15px !important;
+    color: var(--nav-dropdown-color) !important;
+    text-transform: none !important;
+    background-color: transparent !important;
+    /* Ensure transparent background */
+}
+
+.custom-dropdown-menu .custom-dropdown-item:hover,
+.custom-dropdown-menu .custom-dropdown-item.active {
+    color: var(--nav-dropdown-hover-color) !important;
+    background-color: transparent !important;
+    /* Keep background transparent or subtle hover */
+}
+
+/* Mobile Navigation Toggle (Hamburger Icon) */
+.mobile-nav-toggler {
+    border: 0 !important;
+    /* Remove default Bootstrap button border */
+    padding: 0 !important;
+    /* Remove default Bootstrap button padding */
+    margin-right: 10px;
+    /* Match original margin */
+    line-height: 0;
+}
+
+.mobile-nav-toggler:focus {
+    box-shadow: none !important;
+    /* Remove focus outline */
+    outline: none !important;
+}
+
+.mobile-nav-toggler i {
+    color: var(--nav-color);
+    font-size: 28px;
+    /* Match original icon size */
+    transition: color 0.3s;
+}
+
+/* Mobile Menu Panel */
+@media (max-width: 991.98px) {
+
+    /* Bootstrap's 'lg' breakpoint */
+    .header .navbar-collapse {
+        position: fixed;
+        inset: 60px 20px 20px 20px;
+        /* Match original inset positioning */
+        padding: 10px 0 !important;
+        /* Vertical padding inside the mobile menu panel */
+        background-color: var(--nav-mobile-background-color) !important;
+        border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%) !important;
+        border-radius: 6px;
+        box-shadow: none !important;
+        /* Remove any default Bootstrap shadow */
+        overflow-y: auto;
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Prevent flickering during Bootstrap's collapse transition */
+    .header .navbar-collapse.collapsing {
+        transition: none;
+    }
+
+    /* Adjust styles for nav links within the mobile menu */
+    .custom-navbar-nav .nav-item .custom-navbar-link {
+        padding: 10px 20px !important;
+        /* Adjust padding for mobile links */
+        font-size: 17px !important;
+        /* Adjust font size for mobile */
+        font-weight: 500 !important;
+        color: var(--nav-dropdown-color) !important;
+        /* Default mobile link color */
+        justify-content: flex-start;
+        /* Align text and caret to start */
+    }
+
+    .custom-navbar-nav .nav-item .custom-navbar-link::before {
+        display: none;
+        /* Hide underline effect on mobile */
+    }
+
+    .custom-navbar-nav .nav-item .custom-navbar-link:hover,
+    .custom-navbar-nav .nav-item .custom-navbar-link.active {
+        color: var(--nav-dropdown-hover-color) !important;
+        background-color: color-mix(in srgb, var(--accent-color), transparent 95%) !important;
+        /* Light highlight for active/hover mobile links */
+    }
+
+    /* Mobile Dropdown Styling (nested within the mobile menu panel) */
+    .custom-dropdown-menu {
+        position: static !important;
+        /* Make dropdowns static in mobile menu */
+        background-color: color-mix(in srgb, var(--default-color), transparent 97%) !important;
+        /* Slightly darker background for nested dropdowns */
+        box-shadow: none !important;
+        /* Remove shadow for nested dropdowns */
+        border: none !important;
+        /* Remove border for nested dropdowns */
+        width: auto !important;
+        min-width: unset !important;
+        margin: 10px 0 10px 20px !important;
+        /* Indent nested dropdowns */
+        padding: 0 !important;
+        border-radius: 0 !important;
+        /* Remove border radius for nested mobile dropdown */
+    }
+
+    .custom-dropdown-menu .custom-dropdown-item {
+        padding-left: 30px !important;
+        /* Further indent nested items */
+    }
+}
+
+/* Adjust the toggler button when mobile menu is active */
+body.mobile-nav-active .mobile-nav-toggler {
+    color: #fff;
+    /* White icon when menu is open */
+    position: absolute;
+    /* Needed for top/right positioning */
+    font-size: 32px;
+    /* Larger 'X' icon */
+    top: 15px;
+    right: 15px;
+    margin-right: 0;
+    z-index: 9999;
+}
+
+body.mobile-nav-active .mobile-nav-toggler i {
+    color: #fff;
+    /* Explicitly white icon */
+}

@@ -1,0 +1,67 @@
+/* Custom styles for the modal */
+#productQuickViewModal .modal-product-title {
+    color: var(--heading-color);
+    font-family: var(--heading-font);
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+#productQuickViewModal .modal-product-price {
+    color: var(--accent-color);
+}
+
+#productQuickViewModal .modal-body img {
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+#productQuickViewModal .form-label {
+    font-family: var(--default-font);
+}
+
+#productQuickViewModal .btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#productQuickViewModal .btn-primary:hover {
+    background-color: color-mix(in srgb, var(--accent-color), black 10%);
+    border-color: color-mix(in srgb, var(--accent-color), black 10%);
+}
+
+#productQuickViewModal .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+#productQuickViewModal .btn-secondary:hover {
+    background-color: color-mix(in srgb, #6c757d, black 10%);
+    border-color: color-mix(in srgb, #6c757d, black 10%);
+}
+
+#modal-product-ingredients,
+#modal-product-allergens {
+    font-family: var(--default-font);
+    font-weight: 400;
+    color: var(--default-color);
+}
+
+#modal-product-allergens.text-danger {
+    color: #dc3545 !important;
+    /* Ensure red for allergens */
+}
+
+/* Custom styles for Telegram button */
+.btn-telegram-share {
+    background-color: #0088cc;
+    /* Telegram blue */
+    border-color: #0088cc;
+    color: #fff;
+}
+
+.btn-telegram-share:hover {
+    background-color: color-mix(in srgb, #0088cc, black 10%);
+    border-color: color-mix(in srgb, #0088cc, black 10%);
+}

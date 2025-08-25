@@ -1,0 +1,53 @@
+
+/* Custom styles for search bar */
+.search-bar-container {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.search-bar-container .form-control {
+    max-width: 600px;
+    margin: 0 auto;
+    border-radius: 50px;
+    padding: 12px 25px;
+    border: 2px solid color-mix(in srgb, var(--default-color), transparent 70%);
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    background-color: var(--surface-color);
+    /* Matches theme */
+    color: var(--default-color);
+    /* Matches theme */
+}
+
+.search-bar-container .form-control::placeholder {
+    color: color-mix(in srgb, var(--default-color), transparent 50%);
+    /* Matches theme */
+}
+
+.search-bar-container .form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 70%);
+    background-color: var(--surface-color);
+    /* Ensure consistent background on focus */
+    color: var(--default-color);
+    /* Ensure consistent text color on focus */
+}
+
+.no-results-message {
+    font-family: var(--default-font);
+    font-size: 1.2rem;
+    color: color-mix(in srgb, var(--default-color), transparent 30%);
+    text-align: center;
+    margin-top: 30px;
+}
+
+.menu-img {
+    width: 100%;
+    /* makes it fill column width */
+    height: 250px;
+    /* fixed height (adjust as you like) */
+    object-fit: cover;
+    /* crop image to fill box without distortion */
+    border-radius: 10px;
+    /* optional: rounded corners */
+}
