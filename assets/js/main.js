@@ -4,101 +4,33 @@
   "use strict";
 
   // --- Global Constants & Variables ---
-  window.selectBody = null;
-  window.selectHeader = null;
-  window.scrollTopBtn = null;
-  window.productQuickViewModal = null;
+  // These are declared globally within the IIFE, making them accessible to other scripts
+  // loaded *after* main.js, which is the intention for page-specific scripts.
+  window.selectBody = null; // Made global for page-specific scripts to access if needed
+  window.selectHeader = null; // Made global
+  window.scrollTopBtn = null; // Made global
+  window.productQuickViewModal = null; // Bootstrap Modal instance - Made global for menu.html
+  const REVIEWS_MOCK_API_URL = 'https://68ac62797a0bbe92cbba425d.mockapi.io/reviews'; // <--- NEW CONSTANT
 
-  const SHIPPING_FLAT_RATE = 10.00;
+  const SHIPPING_FLAT_RATE = 10.00; // Example shipping rate (constant, can remain local to main.js if only used internally)
 
   const DEFAULT_USER_ID = 'guest';
   let currentUserId = DEFAULT_USER_ID;
 
-  // NEW MockAPI URLs
-  const REVIEWS_MOCK_API_URL = 'https://68ac62797a0bbe92cbba425d.mockapi.io/reviews';
-  const USERS_MOCK_API_URL = 'https://68ac8ae87a0bbe92cbbac511.mockapi.io/users'; // <--- NEW CONSTANT FOR USERS
-
   // --- Utility Functions for LocalStorage ---
-  // These will now primarily be used for caching or temporary local state,
-  // with MockAPI being the source of truth for 'kuihTradisiUsers'.
 
   const _getRawData = (key, defaultValue = []) => JSON.parse(localStorage.getItem(key)) || defaultValue;
   const _saveRawData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
-  // Modified: _getUsers now fetches from MockAPI first, then falls back to local storage.
-  // It also caches the data locally after a successful API fetch.
-  const _getUsers = () => {
-      // Return a Deferred/Promise for asynchronous operation
-      return $.getJSON(USERS_MOCK_API_URL)
-          .done(apiUsers => {
-              const normalizedUsers = apiUsers.map(user => {
-                  user.username = user.username || user.email;
-                  user.displayName = user.displayName || user.name || (user.username ? user.username.split('@')[0] : 'Unknown User');
-                  user.cart = Array.isArray(user.cart) ? user.cart : [];
-                  user.discount = typeof user.discount === 'boolean' ? user.discount : false;
-                  return user;
-              });
-              _saveRawData('kuihTradisiUsers', normalizedUsers); // Cache fetched users locally
-              console.log("Users fetched from MockAPI and cached locally.");
-          })
-          .fail((xhr, status, error) => {
-              console.warn("Failed to fetch users from MockAPI, falling back to local storage.", status, error);
-          })
-          // Always return the data, either from API or local storage (if fallback)
-          .then(() => _getRawData('kuihTradisiUsers'));
-  };
-
-  // Modified: _saveUsers now POSTs/PUTs to MockAPI, then updates local storage.
-  const _saveUsers = (users) => {
-      // This is a more complex operation as it needs to differentiate between new and existing users.
-      // For simplicity here, we'll iterate and update/create on MockAPI.
-      // In a real app, this would be more optimized (e.g., batch updates, specific user update endpoints).
-      // This function will return a Deferred that resolves when all MockAPI updates are done.
-      const deferred = $.Deferred();
-      let promises = [];
-
-      // First, update local storage directly for immediate UI reflection
-      _saveRawData('kuihTradisiUsers', users);
-      console.log("Local storage users updated.");
-
-      // Then, try to sync with MockAPI
-      _getUsers().done(existingApiUsers => {
-          users.forEach(user => {
-              const existingApiUser = existingApiUsers.find(apiUser => apiUser.id === user.id);
-              if (existingApiUser) {
-                  // User exists on MockAPI, update it (PUT)
-                  promises.push($.ajax({
-                      url: `${USERS_MOCK_API_URL}/${user.id}`,
-                      type: 'PUT',
-                      contentType: 'application/json',
-                      data: JSON.stringify(user)
-                  }).fail(e => console.error(`Failed to update user ${user.id} on MockAPI`, e)));
-              } else if (user.id.startsWith('user_') || user.id.startsWith('google_')) { // Only create if it's a new "real" user, not a transient local user
-                  // New user, create it (POST)
-                  promises.push($.post(USERS_MOCK_API_URL, user, 'json')
-                      .done(response => {
-                          // Update local user ID if MockAPI assigned a new one
-                          user.id = response.id; // MockAPI assigns IDs on POST
-                          const currentLocalUsers = _getRawData('kuihTradisiUsers');
-                          const localUserIndex = currentLocalUsers.findIndex(u => u.username === user.username && u.password === user.password); // Find by original ID might be tricky if it was temp
-                          if (localUserIndex > -1) {
-                            currentLocalUsers[localUserIndex].id = response.id;
-                            _saveRawData('kuihTradisiUsers', currentLocalUsers); // Update local storage with API-assigned ID
-                          }
-                      })
-                      .fail(e => console.error(`Failed to create user ${user.username} on MockAPI`, e)));
-              }
-          });
-
-          $.when(...promises).then(() => {
-              console.log("MockAPI users sync attempted.");
-              deferred.resolve();
-          }).fail(() => deferred.reject("Failed to sync users with MockAPI"));
-      });
-
-      return deferred.promise();
-  };
-
+  // Normalize user data on retrieval for consistency
+  const _getUsers = () => _getRawData('kuihTradisiUsers').map(user => {
+      user.username = user.username || user.email;
+      user.displayName = user.displayName || user.name || (user.username ? user.username.split('@')[0] : 'Unknown User');
+      user.cart = Array.isArray(user.cart) ? user.cart : [];
+      user.discount = typeof user.discount === 'boolean' ? user.discount : false;
+      return user;
+  });
+  const _saveUsers = (users) => _saveRawData('kuihTradisiUsers', users);
 
   // Helper to decode JWT (Google ID token) - for client-side use only
   const decodeJwtResponse = (token) => JSON.parse(decodeURIComponent(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
@@ -115,122 +47,83 @@
   // These functions are exposed globally via the `window` object for page-specific scripts to call.
 
   window.registerUser = (email, password, displayName) => {
-    return _getUsers().then(users => { // Ensure users are fetched from API
-        if (users.some(user => user.username.toLowerCase() === email.toLowerCase())) {
-            return $.Deferred().reject({ message: 'An account with this email already exists. Please login.' }).promise();
-        }
-        const newUser = { username: email, displayName, password, cart: [], discount: false }; // Let MockAPI assign ID
-        // POST to MockAPI directly, then update local cache
-        return $.post(USERS_MOCK_API_URL, newUser, 'json')
-            .done(response => {
-                // MockAPI has assigned an ID. Update local cache with this response.
-                const currentLocalUsers = _getRawData('kuihTradisiUsers');
-                currentLocalUsers.push(response);
-                _saveRawData('kuihTradisiUsers', currentLocalUsers);
-                console.log("User registered on MockAPI and cached locally.");
-            })
-            .fail((xhr, status, error) => {
-                console.error("Failed to register user on MockAPI:", status, error, xhr.responseText);
-                return $.Deferred().reject({ message: 'Registration failed due to server error.' }).promise();
-            });
-    });
+    const users = _getUsers();
+    if (users.some(user => user.username.toLowerCase() === email.toLowerCase())) {
+      return $.Deferred().reject({ message: 'An account with this email already exists. Please login.' }).promise();
+    }
+    const newUser = { id: 'user_' + Date.now(), username: email, displayName, password, cart: [], discount: false };
+    users.push(newUser);
+    _saveUsers(users);
+    return $.Deferred().resolve(newUser).promise();
   };
 
   window.loginUser = (username, password) => {
-    return _getUsers().then(users => { // Ensure users are fetched from API
-        const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-        return user ? $.Deferred().resolve(user).promise() : $.Deferred().reject({ message: 'Invalid email or password.' }).promise();
-    });
+    const users = _getUsers();
+    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+    return user ? $.Deferred().resolve(user).promise() : $.Deferred().reject({ message: 'Invalid email or password.' }).promise();
   };
 
   const googleAuthLogin = (googleUserPayload) => {
-    return _getUsers().then(users => { // Ensure users are fetched from API
-        const userId = 'google_' + googleUserPayload.sub;
-        const username = googleUserPayload.email;
-        const displayName = googleUserPayload.name || username.split('@')[0];
+    let users = _getUsers();
+    const userId = 'google_' + googleUserPayload.sub;
+    const username = googleUserPayload.email;
+    const displayName = googleUserPayload.name || username.split('@')[0];
 
-        let user = users.find(u => u.username === username);
-        if (!user) {
-            // New Google user, POST to MockAPI
-            const newUser = { id: userId, username: username, displayName: displayName, password: 'GOOGLE_NO_PASSWORD', cart: [], discount: true };
-            return $.post(USERS_MOCK_API_URL, newUser, 'json')
-                .done(response => {
-                    const currentLocalUsers = _getRawData('kuihTradisiUsers');
-                    currentLocalUsers.push(response);
-                    _saveRawData('kuihTradisiUsers', currentLocalUsers);
-                    console.log("LocalStorage: New Google user registered and synced with MockAPI.");
-                    return $.Deferred().resolve(response).promise();
-                })
-                .fail(e => {
-                    console.error("Failed to register Google user on MockAPI:", e);
-                    return $.Deferred().reject({ message: 'Google registration failed on server.' }).promise();
-                });
-        } else {
-            // Existing Google user, update if needed (PUT), then resolve
-            user.id = userId; // Ensure ID matches Google ID
-            user.displayName = displayName;
-            user.discount = true; // Ensure existing user gets discount
-            return $.ajax({
-                url: `${USERS_MOCK_API_URL}/${user.id}`,
-                type: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(user)
-            })
-            .done(() => {
-                _saveUsers(_getRawData('kuihTradisiUsers').map(u => u.id === user.id ? user : u)); // Update local cache with latest
-                console.log("LocalStorage: Existing Google user logged in and synced with MockAPI.");
-                return $.Deferred().resolve(user).promise();
-            })
-            .fail(e => {
-                console.error("Failed to update existing Google user on MockAPI:", e);
-                // Even if API update fails, we can still proceed with local user data for session
-                return $.Deferred().resolve(user).promise();
-            });
-        }
-    });
+    let user = users.find(u => u.username === username);
+    if (!user) {
+        user = { id: userId, username: username, displayName: displayName, password: 'GOOGLE_NO_PASSWORD', cart: [], discount: true };
+        users.push(user);
+        _saveUsers(users);
+        console.log("LocalStorage: New Google user registered.");
+    } else {
+        user.id = userId; // Ensure ID matches Google ID
+        user.displayName = displayName;
+        user.discount = true; // Ensure existing user gets discount
+        _saveUsers(users);
+        console.log("LocalStorage: Existing Google user logged in.");
+    }
+    return $.Deferred().resolve(user).promise();
   };
 
   window.logoutUser = () => {
-    // Save active cart to permanent storage (which now means MockAPI for registered users)
-    saveCartToPermanentStorage(currentUserId, window.getCart()).always(() => {
-        document.cookie = `kuihTradisi_user_id=; path=/; max-age=0`; // Clear cookie
-        currentUserId = DEFAULT_USER_ID; // Reset to guest
-        loadCartForCurrentUser(); // Load guest cart
-        sessionStorage.clear(); // Clear session data
-        updateAccountDropdown();
-        updateCartIndicator();
+    saveCartToPermanentStorage(currentUserId, window.getCart()); // Save current active cart
+    document.cookie = `kuihTradisi_user_id=; path=/; max-age=0`; // Clear cookie
+    currentUserId = DEFAULT_USER_ID; // Reset to guest
+    loadCartForCurrentUser(); // Load guest cart
+    sessionStorage.clear(); // Clear session data
+    updateAccountDropdown();
+    updateCartIndicator();
 
-        if (typeof google !== 'undefined' && google.accounts.id) {
-            google.accounts.id.disableAutoSelect();
-            console.log("Google auto-select disabled.");
-        }
+    if (typeof google !== 'undefined' && google.accounts.id) {
+        google.accounts.id.disableAutoSelect();
+        console.log("Google auto-select disabled.");
+    }
 
-        const currentPage = window.location.pathname.split('/').pop();
-        const authPages = ['checkout.html', 'ratings.html', 'reviews.html', 'login.html', 'register.html'];
-        if (authPages.includes(currentPage)) {
-            window.location.href = 'index.html';
-        } else {
-            window.location.reload();
-        }
-    });
+    // Redirect logic: If on an auth-required page, go to index. Otherwise, reload.
+    const currentPage = window.location.pathname.split('/').pop();
+    const authPages = ['checkout.html', 'ratings.html', 'reviews.html', 'login.html', 'register.html'];
+    if (authPages.includes(currentPage)) {
+        window.location.href = 'index.html';
+    } else {
+        window.location.reload();
+    }
   };
 
+  // Exposed globally so page-specific login/register scripts can use it
   window._processAuthSuccess = (user) => {
-    // Save previous user's active cart to permanent storage before switching
-    saveCartToPermanentStorage(currentUserId, window.getCart()).always(() => {
-        document.cookie = `kuihTradisi_user_id=${user.id}; path=/; max-age=${60 * 60 * 24 * 7}`;
-        currentUserId = user.id;
-        loadCartForCurrentUser(); // Load new user's permanent cart
-        sessionStorage.clear();
-        updateAccountDropdown();
-        updateCartIndicator();
+    saveCartToPermanentStorage(currentUserId, window.getCart()); // Save previous user's active cart
+    document.cookie = `kuihTradisi_user_id=${user.id}; path=/; max-age=${60 * 60 * 24 * 7}`;
+    currentUserId = user.id;
+    loadCartForCurrentUser(); // Load new user's permanent cart
+    sessionStorage.clear();
+    updateAccountDropdown();
+    updateCartIndicator();
 
-        const currentPage = window.location.pathname.split('/').pop();
-        const authPages = ['login.html', 'register.html'];
-        if (authPages.includes(currentPage)) {
-            window.location.href = 'index.html';
-        }
-    });
+    const currentPage = window.location.pathname.split('/').pop();
+    const authPages = ['login.html', 'register.html'];
+    if (authPages.includes(currentPage)) {
+        window.location.href = 'index.html';
+    }
     return true;
   };
 
@@ -242,138 +135,109 @@
   window.saveCart = (cart) => {
     _saveRawData('kuihTradisiCart', cart); // Update active session cart
     updateCartIndicator();
-    // Persist to user's storage, which now involves MockAPI for logged-in users.
-    saveCartToPermanentStorage(currentUserId, cart);
-    console.log(`Active cart saved and persistence initiated for user ${currentUserId}.`);
+    saveCartToPermanentStorage(currentUserId, cart); // Persist to user's storage
+    console.log(`Active cart saved and persisted for user ${currentUserId}.`);
   };
 
   const saveCartToPermanentStorage = (userIdToSave, cartToSave) => {
-      const deferred = $.Deferred();
-      if (userIdToSave === DEFAULT_USER_ID) {
-          _saveRawData('kuihTradisiGuestCart', cartToSave);
-          deferred.resolve();
+    if (userIdToSave === DEFAULT_USER_ID) {
+      _saveRawData('kuihTradisiGuestCart', cartToSave);
+    } else {
+      const users = _getUsers();
+      const userIndex = users.findIndex(u => u.id === userIdToSave);
+      if (userIndex > -1) {
+        users[userIndex].cart = cartToSave;
+        _saveUsers(users);
       } else {
-          _getUsers().then(users => { // Fetch latest users to ensure we have current data
-              const userIndex = users.findIndex(u => u.id === userIdToSave);
-              if (userIndex > -1) {
-                  users[userIndex].cart = cartToSave;
-                  // Immediately update local cache
-                  _saveRawData('kuihTradisiUsers', users);
-                  // Then, update on MockAPI
-                  $.ajax({
-                      url: `${USERS_MOCK_API_URL}/${userIdToSave}`,
-                      type: 'PUT',
-                      contentType: 'application/json',
-                      data: JSON.stringify({ cart: cartToSave }) // Only send the cart for update
-                  })
-                  .done(() => {
-                      console.log(`Cart for user ${userIdToSave} updated on MockAPI.`);
-                      deferred.resolve();
-                  })
-                  .fail((xhr, status, error) => {
-                      console.error(`Failed to update cart for user ${userIdToSave} on MockAPI:`, status, error);
-                      deferred.reject();
-                  });
-              } else {
-                  console.error(`User ${userIdToSave} not found in fetched users, cart not saved permanently.`);
-                  deferred.reject();
-              }
-          }).fail(() => {
-              console.error("Failed to fetch users to save cart permanently.");
-              deferred.reject();
-          });
+        console.error(`User ${userIdToSave} not found, cart not saved permanently.`);
       }
-      return deferred.promise();
+    }
   };
 
   const loadCartForCurrentUser = () => {
     let cartToLoad = [];
     if (currentUserId === DEFAULT_USER_ID) {
       cartToLoad = _getRawData('kuihTradisiGuestCart');
-      _saveRawData('kuihTradisiCart', cartToLoad); // Set active session cart
-      updateCartIndicator();
-      console.log(`Guest cart loaded into active session.`);
     } else {
-        _getUsers().then(users => { // Fetch users to get the latest cart
-            const user = users.find(u => u.id === currentUserId);
-            if (user) {
-                cartToLoad = user.cart;
-                _saveRawData('kuihTradisiCart', cartToLoad); // Set active session cart
-                updateCartIndicator();
-                console.log(`Cart for ${currentUserId} loaded into active session.`);
-            } else {
-                console.warn(`User ${currentUserId} not found in MockAPI. Loading guest cart & resetting status.`);
-                cartToLoad = _getRawData('kuihTradisiGuestCart');
-                _saveRawData('kuihTradisiCart', cartToLoad); // Set active session cart
-                currentUserId = DEFAULT_USER_ID;
-                document.cookie = `kuihTradisi_user_id=; path=/; max-age=0`; // Clear invalid user cookie
-                updateCartIndicator();
-                updateAccountDropdown(); // Update dropdown to show guest status
-            }
-        }).fail(() => {
-            console.error("Failed to fetch users to load cart. Loading guest cart as fallback.");
-            cartToLoad = _getRawData('kuihTradisiGuestCart');
-            _saveRawData('kuihTradisiCart', cartToLoad);
-            currentUserId = DEFAULT_USER_ID; // Force guest if API fails to load users
-            document.cookie = `kuihTradisi_user_id=; path=/; max-age=0`;
-            updateCartIndicator();
-            updateAccountDropdown();
-        });
+      const user = _getUsers().find(u => u.id === currentUserId);
+      if (user) {
+        cartToLoad = user.cart;
+      } else {
+        console.warn(`User ${currentUserId} not found. Loading guest cart & resetting status.`);
+        cartToLoad = _getRawData('kuihTradisiGuestCart');
+        currentUserId = DEFAULT_USER_ID;
+        document.cookie = `kuihTradisi_user_id=; path=/; max-age=0`;
+      }
     }
+    _saveRawData('kuihTradisiCart', cartToLoad); // Set active session cart
+    updateCartIndicator();
+    console.log(`Cart for ${currentUserId} loaded into active session.`);
   };
 
   window.addToCart = (item) => {
     const cart = window.getCart();
+    // Ensure item has a unique ID, combining product ID and packaging option
     const itemUniqueId = `${item.name.replace(/\s+/g, '-')}-${item.packagingOption}`;
     const existingItemIndex = cart.findIndex(cartItem => cartItem.id === itemUniqueId);
 
     if (existingItemIndex > -1) {
       cart[existingItemIndex].quantity += item.quantity;
     } else {
-      item.id = itemUniqueId;
+      item.id = itemUniqueId; // Assign the unique ID
       cart.push(item);
     }
     window.saveCart(cart); // This updates active cart and persists it.
     console.log(`Added to cart: ${item.quantity} x ${item.name} (${item.packagingOption})`);
   };
 
-  window.deleteCartItem = (itemId) => {
+window.deleteCartItem = (itemId) => {
     let cart = window.getCart();
     const initialLength = cart.length;
     cart = cart.filter(item => item.id !== itemId);
 
     if (cart.length < initialLength) {
-      window.saveCart(cart);
+      window.saveCart(cart); // This updates active cart and persists it, and calls updateCartIndicator.
       console.log(`Item with ID ${itemId} removed from cart.`);
+      
+      // NEW LOGIC: Check if the page-specific function exists and call it.
+      // We also check if the current page is indeed the checkout page.
       if (typeof window.initializeCheckoutPage === 'function' && document.body.classList.contains('checkout-page')) {
-          window.initializeCheckoutPage(SHIPPING_FLAT_RATE);
+          // Pass the SHIPPING_FLAT_RATE as it's a constant known in main.js
+          window.initializeCheckoutPage(SHIPPING_FLAT_RATE); 
       }
     } else {
       console.warn(`Item with ID ${itemId} not found in cart.`);
     }
-  };
+};
 
   // --- REVIEWS MANAGEMENT ---
-  // (Already modified in previous request, kept here for completeness)
+  // These functions are exposed globally via the `window` object for page-specific scripts to call.
 
-  window.getReviews = () => {
+    window.getReviews = () => {
+      // For getting reviews, we should now attempt to fetch from MockAPI first
       return $.getJSON(REVIEWS_MOCK_API_URL)
           .done(apiReviews => {
+              // Optionally, update local storage with fetched data for offline capability/cache
               _saveRawData('kuihTradisiReviews', apiReviews);
               console.log("Reviews fetched from MockAPI and updated local storage.");
           })
           .fail((xhr, status, error) => {
               console.warn("Failed to fetch reviews from MockAPI, falling back to local storage.", status, error);
+              // Fallback to local storage if API call fails
               return $.Deferred().resolve(_getRawData('kuihTradisiReviews')).promise();
           });
   };
-
+  
   window.saveReview = (review) => {
+    // Return the Deferred object from the AJAX call directly
     return $.post(REVIEWS_MOCK_API_URL, review, 'json')
         .done(response => {
             console.log('Review submitted successfully to MockAPI:', response);
+            // Optionally, refresh local storage reviews to include the newly added one
+            // This is crucial for `getReviews` to pick it up without a full page reload if it also reads from API
+            // Or, you can just push it to the current local cache
             const reviews = _getRawData('kuihTradisiReviews');
-            reviews.push(response);
+            reviews.push(response); // Use the response from MockAPI, as it might have an 'id'
             _saveRawData('kuihTradisiReviews', reviews);
             console.log("Local storage reviews updated with new API review.");
             return $.Deferred().resolve({ success: true, message: 'Review submitted.', data: response }).promise();
@@ -394,7 +258,7 @@
   // --- Global UI Updates ---
 
   const updateCartIndicator = () => {
-    const cart = window.getCart(); // This retrieves from local storage (active session cart)
+    const cart = window.getCart();
     const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
     const cartIndicator = document.getElementById('cart-indicator');
     if (cartIndicator) {
@@ -413,15 +277,8 @@
       accountUsernameSpan.textContent = 'My Account';
       accountDropdownMenu.innerHTML = `<li><a href="login.html" class="dropdown-item custom-dropdown-item">Login</a></li><li><a href="register.html" class="dropdown-item custom-dropdown-item">Register</a></li>`;
     } else {
-        // Asynchronously get users to find the current user for display name
-        _getUsers().then(users => {
-            const currentUser = users.find(user => user.id === currentUserId);
-            accountUsernameSpan.textContent = currentUser ? `Welcome, ${currentUser.displayName}` : 'My Account';
-        }).fail(() => {
-            accountUsernameSpan.textContent = 'My Account'; // Fallback if user fetch fails
-            console.error("Could not load current user data for dropdown, showing default.");
-        });
-
+      const currentUser = _getUsers().find(user => user.id === currentUserId);
+      accountUsernameSpan.textContent = currentUser ? `Welcome, ${currentUser.displayName}` : 'My Account';
       accountDropdownMenu.innerHTML = `<li><a href="#" class="dropdown-item custom-dropdown-item" id="logout-link">Logout</a></li>`;
       document.getElementById('logout-link')?.addEventListener('click', (e) => {
           e.preventDefault();
@@ -432,7 +289,7 @@
 
   const toggleScrolled = () => {
     if (!window.selectHeader) return;
-    document.body.classList.add('scrolled');
+    document.body.classList.add('scrolled'); // Use document.body here for consistency with original template
     if (window.scrollY === 0) {
         document.body.classList.remove('scrolled');
     }
@@ -447,7 +304,7 @@
     window.selectHeader = document.querySelector('#header');
     const navbarCollapseElement = document.getElementById('navbarNav');
     if (navbarCollapseElement) {
-      $(navbarCollapseElement).on('show.bs.collapse', () => {
+      $(navbarCollapseElement).on('show.bs.collapse', () => { // Using jQuery for Bootstrap events
         document.body.classList.add('mobile-nav-active', 'header-overlay');
         $('.mobile-nav-toggler i').removeClass('bi-list').addClass('bi-x');
       }).on('hide.bs.collapse', () => {
@@ -462,7 +319,7 @@
       });
     }
 
-    $(document).on('scroll', toggleScrolled);
+    $(document).on('scroll', toggleScrolled); // Using jQuery for scroll event
     const currentPath = window.location.pathname.split('/').pop() || 'index.html';
     $('#navbarNav .nav-link, #navbarNav .dropdown-item').each(function() {
       const linkHref = $(this).attr('href');
@@ -474,7 +331,7 @@
 
     toggleScrolled();
     updateCartIndicator();
-    updateAccountDropdown(); // Now relies on _getUsers promise
+    updateAccountDropdown();
   };
 
   const initializeFooterFeaturesAndListeners = () => {
@@ -482,8 +339,8 @@
     if (!window.scrollTopBtn) return;
 
     const toggleScrollTopVisibility = () => window.scrollY > 100 ? window.scrollTopBtn.classList.add('active') : window.scrollTopBtn.classList.remove('active');
-    $(window.scrollTopBtn).on('click', (e) => { e.preventDefault(); $('html, body').animate({ scrollTop: 0 }, 'slow'); });
-    $(window).on('load scroll', toggleScrollTopVisibility);
+    $(window.scrollTopBtn).on('click', (e) => { e.preventDefault(); $('html, body').animate({ scrollTop: 0 }, 'slow'); }); // Using jQuery animate
+    $(window).on('load scroll', toggleScrollTopVisibility); // Using jQuery for load and scroll events
     toggleScrollTopVisibility();
   };
 
@@ -491,12 +348,14 @@
       const modalElement = document.getElementById('productQuickViewModal');
       if (modalElement) {
           window.productQuickViewModal = new bootstrap.Modal(modalElement);
+          // Handlers for product clicks, add to cart, and social share will be in menu.html
       } else {
           console.warn("Product Quick View Modal element not found after loading.");
       }
   };
 
   // --- Google Identity Services (GIS) Integration ---
+  // Exposed globally as it's a callback from Google's SDK.
 
   window.onGoogleSignIn = function(response) {
       console.log('Google Sign-In response received:', response);
@@ -511,7 +370,7 @@
               googleMessageElement.text(`Google: Signed in as ${profile.name}. Logging you in...`);
 
               googleAuthLogin(profile)
-                  .then(window._processAuthSuccess)
+                  .then(window._processAuthSuccess) // Use the global success handler
                   .then(() => console.log("Google login/registration successful with KuihTradisi."))
                   .catch(error => {
                       googleMessageElement.text(error.message || "Google login failed: An unexpected error occurred.").removeClass('text-success').addClass('text-danger');
@@ -531,46 +390,44 @@
   // --- Main DOMContentLoaded Listener (Global Initializations) ---
 
   document.addEventListener('DOMContentLoaded', () => {
-    window.selectBody = $('body')[0];
+    window.selectBody = $('body')[0]; // Set the global variable
 
-    // Load user and cart data initially (this will now involve async API calls)
-    // We wrap this in a promise chain to ensure user and cart are loaded before UI updates that depend on them
-    _getUsers().then(() => { // Ensure users are loaded/cached before proceeding
-        currentUserId = getCookie('kuihTradisi_user_id') || DEFAULT_USER_ID;
-        return loadCartForCurrentUser();
-    }).always(() => { // .always() runs whether previous promises resolved or rejected
-        Promise.all([
-            fetch('navbar.html').then(response => response.text()),
-            fetch('footer.html').then(response => response.text()),
-            fetch('product-modal.html').then(response => response.text())
-        ])
-        .then(([navbarData, footerData, modalData]) => {
-            $('#navbar-placeholder').html(navbarData);
-            initializeNavbarFeaturesAndListeners();
+    currentUserId = getCookie('kuihTradisi_user_id') || DEFAULT_USER_ID;
+    loadCartForCurrentUser();
 
-            $('#footer-placeholder').html(footerData);
-            initializeFooterFeaturesAndListeners();
+    Promise.all([
+      fetch('navbar.html').then(response => response.text()),
+      fetch('footer.html').then(response => response.text()),
+      fetch('product-modal.html').then(response => response.text())
+    ])
+    .then(([navbarData, footerData, modalData]) => {
+      $('#navbar-placeholder').html(navbarData);
+      initializeNavbarFeaturesAndListeners();
 
-            $('#product-modal-placeholder').html(modalData);
-            initializeProductModalAndListeners();
+      $('#footer-placeholder').html(footerData);
+      initializeFooterFeaturesAndListeners();
 
-            if (typeof window.initializeCheckoutPage === 'function') window.initializeCheckoutPage(SHIPPING_FLAT_RATE);
-            if (typeof window.initializeReviewsPage === 'function') window.initializeReviewsPage();
-            if (typeof window.initializeMenuPage === 'function') window.initializeMenuPage();
-            if (typeof window.initializeRatingsPage === 'function') window.initializeRatingsPage(); // Ensure ratings page also gets initialized
-        })
-        .catch(error => console.error('Error loading shared components:', error));
+      $('#product-modal-placeholder').html(modalData);
+      initializeProductModalAndListeners();
 
-        $('#preloader').remove();
-        aosInit();
-        new PureCounter();
-        initSwiper();
+      // Trigger page-specific initializations if their functions exist
+      // These will be defined in their respective HTML files.
+      if (typeof window.initializeCheckoutPage === 'function') window.initializeCheckoutPage(SHIPPING_FLAT_RATE);
+      if (typeof window.initializeReviewsPage === 'function') window.initializeReviewsPage();
+      if (typeof window.initializeMenuPage === 'function') window.initializeMenuPage();
+    })
+    .catch(error => console.error('Error loading shared components:', error));
 
-        $(window).on('load', () => {
-            if (window.location.hash) {
-                $('html, body').animate({ scrollTop: $(window.location.hash).offset().top }, 'slow');
-            }
-        });
+    $('#preloader').remove();
+    aosInit(); // AOS is init here directly on DOMContentLoaded
+    new PureCounter();
+    initSwiper(); // Initialize Swiper directly on DOMContentLoaded
+
+    // Smooth scroll for hash links (Global functionality)
+    $(window).on('load', () => {
+      if (window.location.hash) {
+        $('html, body').animate({ scrollTop: $(window.location.hash).offset().top }, 'slow');
+      }
     });
   });
 
