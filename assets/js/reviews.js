@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (storedReviews.length > 0) {
                     reviewsListContainer.empty(); // Clear "No reviews yet" message
                     storedReviews.reverse().forEach(review => { // Display newest first
-                    const starsHtml = Array(review.rating).fill('<i class="bi bi-star-fill"></i>').join('') +
-                        Array(5 - review.rating).fill('<i class="bi bi-star"></i>').join('');
+                    const stars = parseInt(review.rating);
+                    const starsHtml = Array(stars).fill('<i class="bi bi-star-fill"></i>').join('') + Array(5 - stars).fill('<i class="bi bi-star"></i>').join('');
 
                     reviewsListContainer.append(`
                         <div class="review-card" data-aos="fade-up">
