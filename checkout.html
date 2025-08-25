@@ -507,6 +507,7 @@
                 const $orderFeedback = $('#orderFeedback');
                 const $checkoutForm = $('#checkoutForm');
                 const $termsCheckbox = $('#termsAndConditions');
+                const cartItems = window.getCart();
 
                 // Form validation
                 if (!$checkoutForm[0].checkValidity()) {
@@ -519,6 +520,12 @@
                     return;
                 }
 
+                if (cartItems.length == 0) {
+                    $orderFeedback.removeClass().addClass('order-feedback error').text('Please add something to cart before you checkout!').fadeIn();
+                    return;
+                }
+
+
                 // Gather billing/delivery data
                 const billingDetails = {};
                 $checkoutForm.find('input, select, textarea').each(function () {
@@ -528,7 +535,6 @@
 
                 // Gather payment and cart data
                 const paymentMethod = $('input[name="paymentMethod"]:checked').val();
-                const cartItems = window.getCart();
 
                 // Calculate totals (re-calculated to be self-contained)
                 let subtotal = 0;
