@@ -1,4 +1,3 @@
-
 (function() {
   "use strict";
 
@@ -348,6 +347,7 @@ const initializeNavbarFeaturesAndListeners = () => {
           productQuickViewModal = new bootstrap.Modal(document.getElementById('productQuickViewModal'));
           setupProductClickListeners();
           setupAddToCartListener();
+          setupSocialShareListeners(); // NEW: Initialize social share buttons
       } else {
           console.warn("Product Quick View Modal element not found after loading.");
       }
@@ -365,7 +365,11 @@ const initializeNavbarFeaturesAndListeners = () => {
         productQuickViewModal._currentProduct = {
             id: data.name.replace(/\s+/g, '-') + '-' + Math.random().toString(36).substr(2, 9),
             name: data.name, image: data.image, basePrice: parseFloat(data.basePrice),
-            ingredients: data.ingredients, allergens: data.allergens, packagingOptions: packaging
+            ingredients: data.ingredients, allergens: data.allergens, packagingOptions: packaging,
+            // Include a shareable URL for the product. For a static site, this might be the menu.html page itself.
+            // For a dynamic product page, this would be its unique URL.
+            shareUrl: window.location.href.split('#')[0] + '#' + data.name.replace(/\s+/g, '-').toLowerCase(),
+            shareText: `Check out this delicious Nyonya Kuih: ${data.name} from KuihTradisi!`
         };
 
         document.getElementById('modal-product-image').src = data.image;
@@ -407,6 +411,55 @@ const initializeNavbarFeaturesAndListeners = () => {
       productQuickViewModal.hide();
     });
   };
+
+  // NEW: Social Media Sharing Logic
+  const setupSocialShareListeners = () => {
+      // Facebook Share
+      $(document).on('click', '.btn-facebook-share', function() {
+          const currentProduct = productQuickViewModal._currentProduct;
+          if (!currentProduct) return;
+
+          // Check if FB SDK is loaded
+          if (typeof FB !== 'undefined') {
+              FB.ui({
+                  method: 'share',
+                  href: currentProduct.shareUrl,
+                  quote: currentProduct.shareText,
+                  hashtag: '#KuihTradisi #NyonyaKuih'
+              }, function(response){
+                  if (response && !response.error_message) {
+                      console.log('Facebook sharing successful.');
+                  } else {
+                      console.warn('Error sharing on Facebook:', response);
+                  }
+              });
+          } else {
+              // Fallback to direct share URL if SDK not loaded
+              const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentProduct.shareUrl)}&quote=${encodeURIComponent(currentProduct.shareText)}`;
+              window.open(fbShareUrl, '_blank', 'width=600,height=400');
+              console.warn('Facebook SDK not loaded. Using fallback share URL.');
+          }
+      });
+
+      // Twitter Share
+      $(document).on('click', '.btn-twitter-share', function() {
+          const currentProduct = productQuickViewModal._currentProduct;
+          if (!currentProduct) return;
+
+          const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(currentProduct.shareText)}&url=${encodeURIComponent(currentProduct.shareUrl)}&hashtags=KuihTradisi,NyonyaKuih`;
+          window.open(twitterShareUrl, '_blank', 'width=600,height=400');
+      });
+
+      // LinkedIn Share
+      $(document).on('click', '.btn-linkedin-share', function() {
+          const currentProduct = productQuickViewModal._currentProduct;
+          if (!currentProduct) return;
+
+          const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentProduct.shareUrl)}`;
+          window.open(linkedInShareUrl, '_blank', 'width=600,height=400');
+      });
+  };
+  // END NEW: Social Media Sharing Logic
 
   const populateCheckoutPage = () => {
     const cart = window.getCart();
@@ -470,7 +523,7 @@ const initializeNavbarFeaturesAndListeners = () => {
         reviewsListContainer.innerHTML = storedReviews.length > 0
           ? storedReviews.reverse().map(review => {
               const starsHtml = Array(review.rating).fill('<i class="bi bi-star-fill"></i>').join('') + Array(5 - review.rating).fill('<i class="bi bi-star"></i>').join('');
-              return `<div class="review-card" data-aos="fade-up"><div class="reviewer-info"><div class="avatar">${review.name.charAt(0).toUpperCase()}</div><div class="name-date"><h4>${review.name}</h4><span class="review-date">${review.date}</span></div></div><p class="product-name">Reviewed on: ${review.product}</p><div class="star-rating">${starsHtml}</div><p class="review-comment">${review.comment}</p></div>`;
+              return `<div class="review-card" data-aos="fade-up"><div class="reviewer-info"><div class="avatar">${review.name.charAt(0).toUpperCase()}</div><div class="name-date"><h4>${review.name}</h4><span class="review-date">${review.date}</span></div><p class="product-name">Reviewed on: ${review.product}</p></div><div class="star-rating">${starsHtml}</div><p class="review-comment">${review.comment}</p></div>`;
             }).join('')
           : '<p class="text-center no-reviews-message">No reviews yet. Be the first to share your experience!</p>';
       })
@@ -521,12 +574,12 @@ const initializeNavbarFeaturesAndListeners = () => {
     loadCartForCurrentUser(); 
 
     // 3. Load shared components (navbar, footer, product modal)
+    // First, load navbar and footer using Promise.all (fetch)
     Promise.all([
       fetch('navbar.html').then(response => response.text()),
-      fetch('footer.html').then(response => response.text()),
-      fetch('product-modal.html').then(response => response.text())
+      fetch('footer.html').then(response => response.text())
     ])
-    .then(([navbarData, footerData, modalData]) => {
+    .then(([navbarData, footerData]) => {
       document.getElementById('navbar-placeholder')?.
         insertAdjacentHTML('afterbegin', navbarData);
       initializeNavbarFeaturesAndListeners();
@@ -535,18 +588,31 @@ const initializeNavbarFeaturesAndListeners = () => {
         insertAdjacentHTML('afterbegin', footerData);
       initializeFooterFeaturesAndListeners();
 
-      document.getElementById('product-modal-placeholder')?.
-        insertAdjacentHTML('afterbegin', modalData);
-      initializeProductModalAndListeners();
+      // After navbar and footer are loaded, load the product modal using jQuery.load()
+      // The callback ensures initializeProductModalAndListeners and page-specific logic run AFTER modal is loaded.
+      // Make sure jQuery is loaded before this part.
+      if (typeof jQuery !== 'undefined') {
+          $('#product-modal-placeholder').load('product-modal.html', function(response, status, xhr) {
+              if (status == "error") {
+                  console.error("Error loading product-modal.html: " + xhr.status + " " + xhr.statusText);
+              } else {
+                  console.log("product-modal.html loaded successfully.");
+                  initializeProductModalAndListeners(); // Initialize modal features after it's in DOM
 
-      // 4. Initialize page-specific scripts *after* shared components are loaded
-      if (selectBody.classList.contains('checkout-page')) populateCheckoutPage();
-      if (selectBody.classList.contains('reviews-page')) populateReviewsPage();
-      if (selectBody.classList.contains('menu-page')) setupMenuSearch();
+                  // 4. Initialize page-specific scripts *after* all shared components are loaded
+                  if (selectBody.classList.contains('checkout-page')) populateCheckoutPage();
+                  if (selectBody.classList.contains('reviews-page')) populateReviewsPage();
+                  if (selectBody.classList.contains('menu-page')) setupMenuSearch();
+                  // The ratings.html page has its own inline script to populate product dropdown and handle submission.
+              }
+          });
+      } else {
+          console.error("jQuery is not loaded. Cannot use $.load() for product-modal.html.");
+      }
     })
     .catch(error => console.error('Error loading shared components:', error));
 
-    // General initializations
+    // General initializations (these do not directly depend on the shared components being loaded)
     document.querySelector('#preloader')?.remove(); // Preloader removal
     window.addEventListener('load', aosInit);
     new PureCounter();
