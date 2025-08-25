@@ -1,0 +1,217 @@
+.checkout-page-section {
+    padding: 60px 0;
+    background-color: var(--background-color);
+}
+
+.checkout-form-container {
+    background-color: var(--surface-color);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+}
+
+.order-summary-container {
+    background-color: color-mix(in srgb, var(--background-color), var(--accent-color) 5%);
+    /* Light accent background */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid color-mix(in srgb, var(--accent-color), transparent 80%);
+    /* Enable flexbox for reordering children */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* Important for `mt-auto` to work */
+}
+
+/* Styling for the payment method images */
+.payment-methods img {
+    height: 30px;
+    /* Adjust as needed */
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+.checkout-form-container h3,
+.order-summary-container h3 {
+    font-family: var(--heading-font);
+    color: var(--heading-color);
+    font-size: 2rem;
+    /* Slightly larger for headings */
+    margin-bottom: 25px;
+    border-bottom: 2px solid color-mix(in srgb, var(--accent-color), transparent 70%);
+    padding-bottom: 10px;
+}
+
+.form-label {
+    font-family: var(--default-font);
+    font-weight: 500;
+    color: var(--default-color);
+    font-size: 1.05rem;
+}
+
+.form-control,
+.form-select,
+.form-check-input {
+    border-color: color-mix(in srgb, var(--default-color), transparent 70%);
+    padding: 10px 15px;
+    font-size: 1rem;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 70%);
+}
+
+.order-table th,
+.order-table td {
+    padding: 12px 5px;
+    /* Adjusted padding */
+    border-bottom: 1px dashed color-mix(in srgb, var(--default-color), transparent 90%);
+    font-family: var(--default-font);
+    color: var(--default-color);
+    font-size: 1rem;
+}
+
+.order-table th {
+    font-weight: 600;
+    color: var(--heading-color);
+}
+
+.order-table tfoot th,
+.order-table tfoot td {
+    border-top: 2px solid color-mix(in srgb, var(--accent-color), transparent 50%);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--heading-color);
+}
+
+.order-table tfoot td {
+    color: var(--accent-color);
+}
+
+.order-table .product-total {
+    text-align: right;
+}
+
+.order-table .product-name {
+    font-weight: 500;
+}
+
+.payment-methods label {
+    font-weight: 500;
+    color: var(--heading-color);
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.payment-option {
+    background-color: var(--surface-color);
+    border: 1px solid color-mix(in srgb, var(--default-color), transparent 85%);
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.payment-option:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.payment-option input[type="radio"] {
+    margin-right: 10px;
+    accent-color: var(--accent-color);
+    /* The actual radio button color */
+    transform: scale(1.2);
+    /* Slightly larger radio button */
+}
+
+.payment-option.selected {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--accent-color), transparent 70%);
+    background-color: color-mix(in srgb, var(--accent-color), transparent 95%);
+}
+
+.btn-place-order {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--contrast-color);
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-place-order:hover {
+    background-color: color-mix(in srgb, var(--accent-color), black 10%);
+    border-color: color-mix(in srgb, var(--accent-color), black 10%);
+}
+
+.form-check-label a {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+.form-check-label a:hover {
+    color: color-mix(in srgb, var(--accent-color), black 10%);
+}
+
+/* Style for the remove button */
+.btn-danger-custom {
+    background-color: #dc3545;
+    /* Bootstrap red for danger */
+    border-color: #dc3545;
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 0.85rem;
+    border-radius: 5px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-danger-custom:hover {
+    background-color: #c82333;
+    /* Darker red on hover */
+    border-color: #bd2130;
+    color: #fff;
+}
+
+.order-table th:last-child,
+.order-table td:last-child {
+    padding-right: 5px;
+    /* Adjust right padding for the last column */
+}
+
+/* Added for AJAX feedback */
+.order-feedback {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+    /* Hidden by default */
+}
+
+.order-feedback.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.order-feedback.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.order-feedback.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}

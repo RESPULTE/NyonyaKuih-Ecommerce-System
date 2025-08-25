@@ -189,22 +189,25 @@
     console.log(`Added to cart: ${item.quantity} x ${item.name} (${item.packagingOption})`);
   };
 
-  window.deleteCartItem = (itemId) => {
+window.deleteCartItem = (itemId) => {
     let cart = window.getCart();
     const initialLength = cart.length;
     cart = cart.filter(item => item.id !== itemId);
 
     if (cart.length < initialLength) {
-      window.saveCart(cart);
+      window.saveCart(cart); // This updates active cart and persists it, and calls updateCartIndicator.
       console.log(`Item with ID ${itemId} removed from cart.`);
-      // If on checkout page, trigger re-population directly.
-      if (window.populateCheckoutPage) { // Check if the page-specific function exists
-          window.populateCheckoutPage();
+      
+      // NEW LOGIC: Check if the page-specific function exists and call it.
+      // We also check if the current page is indeed the checkout page.
+      if (typeof window.initializeCheckoutPage === 'function' && document.body.classList.contains('checkout-page')) {
+          // Pass the SHIPPING_FLAT_RATE as it's a constant known in main.js
+          window.initializeCheckoutPage(SHIPPING_FLAT_RATE); 
       }
     } else {
       console.warn(`Item with ID ${itemId} not found in cart.`);
     }
-  };
+};
 
   // --- REVIEWS MANAGEMENT ---
   // These functions are exposed globally via the `window` object for page-specific scripts to call.
