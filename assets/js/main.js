@@ -64,28 +64,8 @@
       return deferred.promise();
     },
 
-    facebookAuth: function() {
-        const deferred = $.Deferred();
-        setTimeout(() => {
-            const simulatedFbId = 'fb_user_' + Math.random().toString(36).substr(2, 9);
-            const simulatedFbEmail = simulatedFbId + '@facebook.com';
-            const simulatedFbDisplayName = 'Facebook User';
-
-            let users = _getRawData('kuihTradisiUsers');
-            let user = users.find(u => u.username === simulatedFbEmail);
-
-            if (!user) {
-                user = { id: simulatedFbId, username: simulatedFbEmail, displayName: simulatedFbDisplayName, password: 'FB_NO_PASSWORD', cart: [], discount: true };
-                users.push(user);
-                _saveRawData('kuihTradisiUsers', users);
-                console.log("Mock API: New Facebook user registered.");
-            } else {
-                console.log("Mock API: Existing Facebook user logged in.");
-            }
-            deferred.resolve(user);
-        }, this._delay);
-        return deferred.promise();
-    },
+    // Removed facebookAuth as Facebook login is no longer supported
+    // facebookAuth: function(fbUser) { /* ... */ },
 
     getCart: function(userId) {
       const deferred = $.Deferred();
@@ -150,13 +130,21 @@
     sessionStorage.clear(); // Clear session data
     updateAccountDropdown();
     updateCartIndicator();
+
+    // Check if on login/register page and redirect
+    const currentPage = window.location.pathname.split('/').pop();
+    const authPages = ['login.html', 'register.html'];
+    if (authPages.includes(currentPage)) {
+        window.location.href = 'index.html';
+    }
+
     return true;
   };
 
   // Exposed globally for register.html, login.html
   window.registerUser = (email, password, displayName) => mockApi.register(email, password, displayName).then(_processAuthSuccess).catch(() => false);
   window.loginUser = (username, password) => mockApi.login(username, password).then(_processAuthSuccess).catch(() => false);
-  window.registerOrLoginWithFacebook = () => mockApi.facebookAuth().then(_processAuthSuccess).catch(() => false);
+  // Removed window.registerOrLoginWithFacebook
 
   window.logoutUser = () => {
     saveCurrentCartToUser(currentUserId);
@@ -166,6 +154,16 @@
     sessionStorage.clear();
     updateAccountDropdown();
     updateCartIndicator();
+
+    // No Facebook SDK to log out from
+
+    const currentPage = window.location.pathname.split('/').pop();
+    const userSpecificPages = ['checkout.html', 'ratings.html', 'reviews.html', 'login.html', 'register.html'];
+    if (userSpecificPages.includes(currentPage)) {
+        window.location.href = 'index.html';
+    } else {
+        window.location.reload();
+    }
   };
 
   // --- CART MANAGEMENT (TIED TO USER) ---
@@ -244,13 +242,6 @@ const updateCartIndicator = () => {
       document.getElementById('logout-link')?.addEventListener('click', (e) => {
           e.preventDefault();
           window.logoutUser();
-          const currentPage = window.location.pathname.split('/').pop();
-          const userSpecificPages = ['checkout.html', 'ratings.html', 'reviews.html', 'login.html', 'register.html'];
-          if (userSpecificPages.includes(currentPage)) {
-              window.location.href = 'index.html';
-          } else {
-              window.location.reload();
-          }
       });
     }
   };
@@ -347,7 +338,7 @@ const initializeNavbarFeaturesAndListeners = () => {
           productQuickViewModal = new bootstrap.Modal(document.getElementById('productQuickViewModal'));
           setupProductClickListeners();
           setupAddToCartListener();
-          setupSocialShareListeners(); // NEW: Initialize social share buttons
+          setupSocialShareListeners(); // Initialize social share buttons
       } else {
           console.warn("Product Quick View Modal element not found after loading.");
       }
@@ -366,8 +357,7 @@ const initializeNavbarFeaturesAndListeners = () => {
             id: data.name.replace(/\s+/g, '-') + '-' + Math.random().toString(36).substr(2, 9),
             name: data.name, image: data.image, basePrice: parseFloat(data.basePrice),
             ingredients: data.ingredients, allergens: data.allergens, packagingOptions: packaging,
-            // Include a shareable URL for the product. For a static site, this might be the menu.html page itself.
-            // For a dynamic product page, this would be its unique URL.
+            // Shareable URL for the product.
             shareUrl: window.location.href.split('#')[0] + '#' + data.name.replace(/\s+/g, '-').toLowerCase(),
             shareText: `Check out this delicious Nyonya Kuih: ${data.name} from KuihTradisi!`
         };
@@ -412,51 +402,39 @@ const initializeNavbarFeaturesAndListeners = () => {
     });
   };
 
-  // NEW: Social Media Sharing Logic
+  // NEW: Social Media Sharing Logic (WhatsApp, Telegram, X)
   const setupSocialShareListeners = () => {
-      // Facebook Share
-      $(document).on('click', '.btn-facebook-share', function() {
+      // WhatsApp Share
+      $(document).on('click', '.btn-whatsapp-share', function() {
           const currentProduct = productQuickViewModal._currentProduct;
           if (!currentProduct) return;
 
-          // Check if FB SDK is loaded
-          if (typeof FB !== 'undefined') {
-              FB.ui({
-                  method: 'share',
-                  href: currentProduct.shareUrl,
-                  quote: currentProduct.shareText,
-                  hashtag: '#KuihTradisi #NyonyaKuih'
-              }, function(response){
-                  if (response && !response.error_message) {
-                      console.log('Facebook sharing successful.');
-                  } else {
-                      console.warn('Error sharing on Facebook:', response);
-                  }
-              });
+          const whatsappText = encodeURIComponent(currentProduct.shareText + ' ' + currentProduct.shareUrl);
+          // Check if it's a mobile device for direct app link, otherwise use web.whatsapp.com
+          if (/Mobi|Android/i.test(navigator.userAgent)) {
+              window.open(`whatsapp://send?text=${whatsappText}`, '_blank');
           } else {
-              // Fallback to direct share URL if SDK not loaded
-              const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentProduct.shareUrl)}&quote=${encodeURIComponent(currentProduct.shareText)}`;
-              window.open(fbShareUrl, '_blank', 'width=600,height=400');
-              console.warn('Facebook SDK not loaded. Using fallback share URL.');
+              window.open(`https://web.whatsapp.com/send?text=${whatsappText}`, '_blank', 'width=800,height=600');
           }
       });
 
-      // Twitter Share
-      $(document).on('click', '.btn-twitter-share', function() {
+      // Telegram Share
+      $(document).on('click', '.btn-telegram-share', function() {
           const currentProduct = productQuickViewModal._currentProduct;
           if (!currentProduct) return;
 
-          const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(currentProduct.shareText)}&url=${encodeURIComponent(currentProduct.shareUrl)}&hashtags=KuihTradisi,NyonyaKuih`;
-          window.open(twitterShareUrl, '_blank', 'width=600,height=400');
+          const telegramText = encodeURIComponent(currentProduct.shareText);
+          const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(currentProduct.shareUrl)}&text=${telegramText}`;
+          window.open(telegramShareUrl, '_blank', 'width=600,height=400');
       });
 
-      // LinkedIn Share
-      $(document).on('click', '.btn-linkedin-share', function() {
+      // X (Twitter) Share
+      $(document).on('click', '.btn-x-share', function() { // Updated class name
           const currentProduct = productQuickViewModal._currentProduct;
           if (!currentProduct) return;
 
-          const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentProduct.shareUrl)}`;
-          window.open(linkedInShareUrl, '_blank', 'width=600,height=400');
+          const xShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(currentProduct.shareText)}&url=${encodeURIComponent(currentProduct.shareUrl)}&hashtags=KuihTradisi,NyonyaKuih`;
+          window.open(xShareUrl, '_blank', 'width=600,height=400');
       });
   };
   // END NEW: Social Media Sharing Logic
@@ -560,6 +538,9 @@ const initializeNavbarFeaturesAndListeners = () => {
     filterItems();
   };
   // --- END PAGE-SPECIFIC LOGIC ---
+
+  // Removed all Facebook SDK integration from main.js
+
 
   /**
    * Main DOMContentLoaded listener
