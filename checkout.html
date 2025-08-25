@@ -183,6 +183,38 @@
         .form-check-label a:hover {
             color: color-mix(in srgb, var(--accent-color), black 10%);
         }
+
+        /* Style for the remove button */
+        .btn-danger-custom {
+            background-color: #cd7079;
+            /* Bootstrap red for danger */
+            border-color: #e63f4f;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 0.85rem;
+            border-radius: 5px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .btn-danger-custom:hover {
+            background-color: #c82333;
+            /* Darker red on hover */
+            border-color: #bd2130;
+            color: #fff;
+        }
+
+        /* Adjust order table padding for the new column */
+        .order-table th,
+        .order-table td {
+            padding: 12px 5px;
+            /* Slightly adjust padding for all cells */
+        }
+
+        .order-table th:last-child,
+        .order-table td:last-child {
+            padding-right: 0;
+            /* Remove right padding for the last column */
+        }
     </style>
 </head>
 
@@ -216,6 +248,7 @@
                                         <th scope="col">Product</th>
                                         <th scope="col" class="text-center">Qty</th>
                                         <th scope="col" class="text-end">Subtotal</th>
+                                        <th scope="col" class="text-end"></th> <!-- New column for Remove button -->
                                     </tr>
                                 </thead>
                                 <tbody id="order-summary-items">
