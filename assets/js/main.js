@@ -31,7 +31,7 @@
       user.username = user.username || user.email; // Ensure username exists
       user.displayName = user.displayName || user.name || (user.username ? user.username.split('@')[0] : 'Unknown User');
       user.cart = Array.isArray(user.cart) ? user.cart : [];
-      user.discount = typeof user.discount === 'boolean' ? user.discount : false;
+      user.discount = typeof user.discount === 'boolean' ? user.discount : false; // Google users typically get some discount if applicable
       return user;
   }
 
@@ -45,112 +45,81 @@
   };
   const _saveRawData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
-  // --- MOCK API IMPLEMENTATION ---
-  const mockApi = {
-    _delay: 500, // Simulate network latency
+  // --- MOCK API REPLACEMENT: DIRECT LOCALSTORAGE OPERATIONS ---
 
-    register: function(username, password, displayName) {
-      const deferred = $.Deferred();
-      setTimeout(() => {
-        const users = _getRawData('kuihTradisiUsers');
-        if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
-          deferred.reject({ message: 'Username (email) already exists.' });
-          return;
-        }
-        const newUser = { id: 'user_' + Date.now(), username, displayName, password, cart: [], discount: false };
-        users.push(newUser);
-        _saveRawData('kuihTradisiUsers', users);
-        deferred.resolve(newUser);
-      }, this._delay);
-      return deferred.promise();
-    },
-
-    login: function(username, password) {
-      const deferred = $.Deferred();
-      setTimeout(() => {
-        const users = _getRawData('kuihTradisiUsers');
-        const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-        user ? deferred.resolve(user) : deferred.reject({ message: 'Invalid username or password.' });
-      }, this._delay);
-      return deferred.promise();
-    },
-
-    // NEW: Google Auth mock API
-    googleAuth: function(googleUserPayload) {
-        const deferred = $.Deferred();
-        setTimeout(() => {
-            const userId = 'google_' + googleUserPayload.sub; // Use Google's unique 'sub' ID
-            const username = googleUserPayload.email;
-            const displayName = googleUserPayload.name || googleUserPayload.email.split('@')[0];
-
-            let users = _getRawData('kuihTradisiUsers');
-            let user = users.find(u => u.username === username);
-
-            if (!user) {
-                // Register new Google user
-                user = { id: userId, username: username, displayName: displayName, password: 'GOOGLE_NO_PASSWORD', cart: [], discount: true };
-                users.push(user);
-                _saveRawData('kuihTradisiUsers', users);
-                console.log("Mock API: New Google user registered.");
-            } else {
-                // Update existing user's ID if it changed (e.g., if they were guest and then logged in with Google)
-                // Or simply log in existing user.
-                user.id = userId; // Ensure ID matches Google ID
-                // Optionally update displayName if Google provides a better one
-                user.displayName = displayName;
-                _saveRawData('kuihTradisiUsers', users);
-                console.log("Mock API: Existing Google user logged in.");
-            }
-            deferred.resolve(user);
-        }, this._delay);
-        return deferred.promise();
-    },
-
-    getCart: function(userId) {
-      const deferred = $.Deferred();
-      setTimeout(() => {
-        userId === DEFAULT_USER_ID
-          ? deferred.resolve(_getRawData('kuihTradisiGuestCart'))
-          : deferred.resolve(_getRawData('kuihTradisiUsers').find(u => u.id === userId)?.cart || []);
-      }, this._delay);
-      return deferred.promise();
-    },
-
-    saveCart: function(userId, cart) {
-      const deferred = $.Deferred();
-      setTimeout(() => {
-        if (userId === DEFAULT_USER_ID) {
-          _saveRawData('kuihTradisiGuestCart', cart);
-          deferred.resolve({ success: true, message: 'Guest cart saved.' });
-        } else {
-          const users = _getRawData('kuihTradisiUsers');
-          const userIndex = users.findIndex(u => u.id === userId);
-          if (userIndex > -1) {
-            users[userIndex].cart = cart;
-            _saveRawData('kuihTradisiUsers', users);
-            deferred.resolve({ success: true, message: 'User cart saved.' });
-          } else {
-            deferred.reject({ message: 'User not found, cart not saved.' });
-          }
-        }
-      }, this._delay);
-      return deferred.promise();
-    },
-
-    getReviews: () => $.Deferred().resolve(_getRawData('kuihTradisiReviews')).promise(),
-
-    postReview: function(review) {
-      const deferred = $.Deferred();
-      setTimeout(() => {
-        const reviews = _getRawData('kuihTradisiReviews');
-        reviews.push(review);
-        _saveRawData('kuihTradisiReviews', reviews);
-        deferred.resolve({ success: true, message: 'Review submitted.' });
-      }, this._delay);
-      return deferred.promise();
+  // Refactored register function
+  window.registerUser = (email, password, displayName) => {
+    const deferred = $.Deferred();
+    const users = _getRawData('kuihTradisiUsers');
+    if (users.some(user => user.username.toLowerCase() === email.toLowerCase())) {
+      deferred.reject({ message: 'An account with this email already exists. Please login.' });
+    } else {
+      const newUser = { id: 'user_' + Date.now(), username: email, displayName, password, cart: [], discount: false };
+      users.push(newUser);
+      _saveRawData('kuihTradisiUsers', users);
+      deferred.resolve(newUser);
     }
+    return deferred.promise();
   };
-  // --- END MOCK API ---
+
+  // Refactored login function
+  window.loginUser = (username, password) => {
+    const deferred = $.Deferred();
+    const users = _getRawData('kuihTradisiUsers');
+    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+    user ? deferred.resolve(user) : deferred.reject({ message: 'Invalid email or password.' });
+    return deferred.promise();
+  };
+
+  // Refactored Google Auth (now directly uses localStorage)
+  // Note: This function remains globally accessible as `window.onGoogleSignIn`
+  // for the Google Identity Services SDK callback.
+  const googleAuthLogin = (googleUserPayload) => {
+      const deferred = $.Deferred();
+      const userId = 'google_' + googleUserPayload.sub; // Use Google's unique 'sub' ID
+      const username = googleUserPayload.email;
+      const displayName = googleUserPayload.name || googleUserPayload.email.split('@')[0];
+
+      let users = _getRawData('kuihTradisiUsers');
+      let user = users.find(u => u.username === username);
+
+      if (!user) {
+          // Register new Google user
+          user = { id: userId, username: username, displayName: displayName, password: 'GOOGLE_NO_PASSWORD', cart: [], discount: true };
+          users.push(user);
+          _saveRawData('kuihTradisiUsers', users);
+          console.log("LocalStorage: New Google user registered.");
+      } else {
+          // Update existing user's ID if it changed and ensure displayName is fresh
+          user.id = userId;
+          user.displayName = displayName;
+          user.discount = true; // Ensure existing user gets discount if logging in via Google
+          _saveRawData('kuihTradisiUsers', users);
+          console.log("LocalStorage: Existing Google user logged in.");
+      }
+      deferred.resolve(user);
+      return deferred.promise();
+  };
+
+
+  // Refactored getReviews function
+  window.getReviews = () => {
+    const deferred = $.Deferred();
+    deferred.resolve(_getRawData('kuihTradisiReviews'));
+    return deferred.promise();
+  };
+
+  // Refactored postReview function
+  window.saveReview = (review) => {
+    const deferred = $.Deferred();
+    const reviews = _getRawData('kuihTradisiReviews');
+    reviews.push(review);
+    _saveRawData('kuihTradisiReviews', reviews);
+    deferred.resolve({ success: true, message: 'Review submitted.' });
+    return deferred.promise();
+  };
+
+  // --- END MOCK API REPLACEMENT ---
 
   // Utility to get a cookie value
   const getCookie = name => {
@@ -162,11 +131,18 @@
 
   // Helper for common post-authentication steps
   const _processAuthSuccess = (user) => {
-    saveCurrentCartToUser(currentUserId); // Save previous user's cart (could be guest)
+    // Save previous user's (could be guest's) active cart to their permanent storage
+    saveCartToPermanentStorage(currentUserId, window.getCart());
+
     document.cookie = `kuihTradisi_user_id=${user.id}; path=/; max-age=${60 * 60 * 24 * 7}`;
     currentUserId = user.id;
-    loadCartForCurrentUser(); // Load new user's cart
-    sessionStorage.clear(); // Clear session data
+    
+    // Load the new user's permanent cart into the active session cart
+    loadCartForCurrentUser(); 
+    
+    // Clear session-specific data that should not persist across logins
+    sessionStorage.clear(); 
+    
     updateAccountDropdown();
     updateCartIndicator();
 
@@ -177,29 +153,28 @@
         window.location.href = 'index.html';
     }
 
-    return true;
+    return true; // Indicate success for the promise chain
   };
 
-  // Exposed globally for register.html, login.html
-  window.registerUser = (email, password, displayName) => mockApi.register(email, password, displayName).then(_processAuthSuccess).catch(() => false);
-  window.loginUser = (username, password) => mockApi.login(username, password).then(_processAuthSuccess).catch(() => false);
-  // Removed window.registerOrLoginWithFacebook
+  // Removed window.registerOrLoginWithFacebook as it's not present in the current HTML files.
 
   window.logoutUser = () => {
-    saveCurrentCartToUser(currentUserId);
-    document.cookie = `kuihTradisi_user_id=; path=/; max-age=0`;
-    currentUserId = DEFAULT_USER_ID;
-    loadCartForCurrentUser();
-    sessionStorage.clear();
+    // Save current active cart to the logging-out user's permanent storage
+    saveCartToPermanentStorage(currentUserId, window.getCart());
+
+    document.cookie = `kuihTradisi_user_id=; path=/; max-age=0`; // Expire cookie
+    currentUserId = DEFAULT_USER_ID; // Set to guest
+
+    // Load the guest user's permanent cart into the active session cart
+    loadCartForCurrentUser(); 
+    
+    sessionStorage.clear(); // Clear session-specific data
     updateAccountDropdown();
     updateCartIndicator();
 
     // NEW: Sign out from Google Identity Services if user is logged in
     if (typeof google !== 'undefined' && google.accounts.id) {
         google.accounts.id.disableAutoSelect(); // Prevent One Tap from showing on next load
-        // Note: GIS doesn't have a direct "logout from this website's Google session" API
-        // as it's primarily about authenticating with Google, not managing a session.
-        // Clearing our own cookie and disabling auto-select is the main client-side action.
         console.log("Google auto-select disabled for next login.");
     }
 
@@ -213,32 +188,74 @@
   };
 
   // --- CART MANAGEMENT (TIED TO USER) ---
+
+  // Returns the currently active cart from localStorage.kuihTradisiCart
   window.getCart = () => _getRawData('kuihTradisiCart');
 
+  // Saves the given cart to localStorage.kuihTradisiCart (the active session cart)
+  // AND persists it to the current user's permanent storage.
   window.saveCart = (cart) => {
-    _saveRawData('kuihTradisiCart', cart);
+    _saveRawData('kuihTradisiCart', cart); // Save to the active session cart
     updateCartIndicator();
-    mockApi.saveCart(currentUserId, cart)
-      .done(() => console.log(`Cart for ${currentUserId} permanently saved via API.`))
-      .fail(error => console.error(`Failed to permanently save cart for ${currentUserId}:`, error.message));
+    // Also persist to the user's (or guest's) long-term storage
+    saveCartToPermanentStorage(currentUserId, cart);
+    console.log(`Active cart saved and persisted for user ${currentUserId}.`);
   };
 
-  const saveCurrentCartToUser = (userIdToSave) => {
-      const currentLoadedCart = window.getCart();
-      mockApi.saveCart(userIdToSave, currentLoadedCart)
-        .done(() => console.log(`Active cart saved to ${userIdToSave}'s permanent storage via API.`))
+  // Persists the given cart to the specified user's localStorage record.
+  const saveCartToPermanentStorage = (userIdToSave, cartToSave) => {
+      const deferred = $.Deferred();
+
+      if (userIdToSave === DEFAULT_USER_ID) {
+          _saveRawData('kuihTradisiGuestCart', cartToSave);
+          deferred.resolve({ success: true, message: 'Guest cart saved.' });
+      } else {
+          const users = _getRawData('kuihTradisiUsers');
+          const userIndex = users.findIndex(u => u.id === userIdToSave);
+          if (userIndex > -1) {
+              users[userIndex].cart = cartToSave;
+              _saveRawData('kuihTradisiUsers', users);
+              deferred.resolve({ success: true, message: 'User cart saved.' });
+          } else {
+              deferred.reject({ message: 'User not found, cart not saved.' });
+          }
+      }
+      return deferred.promise()
+        .done(() => console.log(`Active cart saved to ${userIdToSave}'s permanent storage.`))
         .fail(error => console.error(`Failed to save active cart to ${userIdToSave}'s storage:`, error.message));
   };
 
+  // Loads the cart for the current user (or guest) into localStorage.kuihTradisiCart.
   const loadCartForCurrentUser = () => {
-      mockApi.getCart(currentUserId)
-        .done(cart => {
-          _saveRawData('kuihTradisiCart', cart);
-          console.log(`Cart for ${currentUserId} loaded into active session from API.`);
+      const deferred = $.Deferred();
+      let cartToLoad = [];
+
+      if (currentUserId === DEFAULT_USER_ID) {
+          cartToLoad = _getRawData('kuihTradisiGuestCart');
+      } else {
+          const users = _getRawData('kuihTradisiUsers');
+          const user = users.find(u => u.id === currentUserId);
+          if (user) {
+              cartToLoad = user.cart;
+          } else {
+              // If user not found (e.g., cookie points to a deleted user), fallback to guest cart or empty
+              console.warn(`User ${currentUserId} not found in storage. Loading guest cart and reverting to guest status.`);
+              cartToLoad = _getRawData('kuihTradisiGuestCart'); // Fallback to guest cart
+              currentUserId = DEFAULT_USER_ID; // Revert to guest
+              document.cookie = `kuihTradisi_user_id=; path=/; max-age=0`; // Clear bad cookie
+          }
+      }
+
+      _saveRawData('kuihTradisiCart', cartToLoad); // Set the active session cart
+      deferred.resolve(cartToLoad); // Resolve immediately as it's synchronous
+
+      return deferred.promise()
+        .done(() => {
+          console.log(`Cart for ${currentUserId} loaded into active session.`);
           updateCartIndicator();
         })
         .fail(error => {
-          console.error(`Failed to load cart for ${currentUserId} from API:`, error.message);
+          console.error(`Failed to load cart for ${currentUserId}:`, error.message);
           _saveRawData('kuihTradisiCart', []); // Fallback to empty cart
           updateCartIndicator();
         });
@@ -251,26 +268,21 @@
     );
     if (existingItemIndex > -1) cart[existingItemIndex].quantity += item.quantity;
     else cart.push(item);
-    window.saveCart(cart);
+    window.saveCart(cart); // This will update active cart and persist it.
     console.log(`Added to cart: ${item.quantity} x ${item.name} (${item.packagingOption}) @ RM ${item.unitPrice.toFixed(2)}`);
   };
   // --- END CART MANAGEMENT ---
 
-  // --- REVIEWS MANAGEMENT (VIA MOCK API) ---
-  window.getReviews = () => mockApi.getReviews().fail(error => console.error("Failed to fetch reviews:", error.message));
-  window.saveReview = (review) => mockApi.postReview(review).fail(error => console.error("Failed to submit review:", error.message));
-  // --- END REVIEWS MANAGEMENT ---
-
   // --- UI UPDATES ---
-const updateCartIndicator = () => {
-  const cart = window.getCart();
-  const uniqueItems = cart.length; // number of unique items in cart
-  const cartIndicator = document.getElementById('cart-indicator');
-  if (cartIndicator) {
-    cartIndicator.textContent = uniqueItems;
-    cartIndicator.style.display = uniqueItems > 0 ? 'inline-block' : 'none';
-  }
-};
+  const updateCartIndicator = () => {
+    const cart = window.getCart();
+    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0); // Sum of all item quantities, NOT just unique items
+    const cartIndicator = document.getElementById('cart-indicator');
+    if (cartIndicator) {
+      cartIndicator.textContent = totalQuantity;
+      cartIndicator.style.display = totalQuantity > 0 ? 'inline-block' : 'none';
+    }
+  };
 
   const updateAccountDropdown = () => {
     const accountDropdownMenu = document.getElementById('account-dropdown-menu');
@@ -284,7 +296,7 @@ const updateCartIndicator = () => {
     } else {
       const currentUser = _getRawData('kuihTradisiUsers').find(user => user.id === currentUserId);
       accountUsernameSpan.textContent = currentUser ? `Welcome, ${currentUser.displayName}` : 'My Account';
-      accountDropdownMenu.innerHTML = `<li><a href="#" id="logout-link">Logout</a></li>`;
+      accountDropdownMenu.innerHTML = `<li><a href="#" class="dropdown-item custom-dropdown-item" id="logout-link">Logout</a></li>`;
       document.getElementById('logout-link')?.addEventListener('click', (e) => {
           e.preventDefault();
           window.logoutUser();
@@ -384,7 +396,7 @@ const initializeNavbarFeaturesAndListeners = () => {
           productQuickViewModal = new bootstrap.Modal(document.getElementById('productQuickViewModal'));
           setupProductClickListeners();
           setupAddToCartListener();
-          setupSocialShareListeners(); // Initialize social share buttons
+          setupSocialShareListeners(); // Initialize social share buttons (added back based on initial request)
       } else {
           console.warn("Product Quick View Modal element not found after loading.");
       }
@@ -405,7 +417,7 @@ const initializeNavbarFeaturesAndListeners = () => {
             ingredients: data.ingredients, allergens: data.allergens, packagingOptions: packaging,
             // Shareable URL for the product.
             shareUrl: window.location.href.split('#')[0] + '#' + data.name.replace(/\s+/g, '-').toLowerCase(),
-            shareText: `Check out this delicious Nyonya Kuih: ${data.name} from KuihTradisi!`
+            shareText: `Check out this delicious Nyonya Kuih: ${data.name} from KuihTradisi!` // Added shareText
         };
 
         document.getElementById('modal-product-image').src = data.image;
@@ -485,6 +497,7 @@ const initializeNavbarFeaturesAndListeners = () => {
   };
   // END Social Media Sharing Logic
 
+
   const populateCheckoutPage = () => {
     const cart = window.getCart();
     const orderItemsBody = document.getElementById('order-summary-items');
@@ -514,6 +527,7 @@ const initializeNavbarFeaturesAndListeners = () => {
     });
   };
 
+  // Changed to localStorage
   const saveCheckoutFormData = () => {
     const form = document.getElementById('checkoutForm');
     if (!form) return;
@@ -521,33 +535,34 @@ const initializeNavbarFeaturesAndListeners = () => {
     form.querySelectorAll('input, select, textarea').forEach(field => {
         formData[field.id] = field.type === 'checkbox' ? field.checked : field.value;
     });
-    sessionStorage.setItem('checkoutFormData', JSON.stringify(formData));
-    console.log("Checkout form data saved to sessionStorage.");
+    localStorage.setItem('checkoutFormData', JSON.stringify(formData)); // Changed to localStorage
+    console.log("Checkout form data saved to localStorage.");
   };
 
+  // Changed to localStorage
   const loadCheckoutFormData = () => {
     const form = document.getElementById('checkoutForm');
     if (!form) return;
-    const savedData = JSON.parse(sessionStorage.getItem('checkoutFormData'));
+    const savedData = JSON.parse(localStorage.getItem('checkoutFormData')); // Changed to localStorage
     if (!savedData) return;
     form.querySelectorAll('input, select, textarea').forEach(field => {
         if (savedData[field.id] !== undefined) {
             field.type === 'checkbox' ? (field.checked = savedData[field.id]) : (field.value = savedData[field.id]);
         }
     });
-    console.log("Checkout form data loaded from sessionStorage.");
+    console.log("Checkout form data loaded from localStorage.");
   };
 
   const populateReviewsPage = () => {
     const reviewsListContainer = document.getElementById('reviews-list');
     if (!reviewsListContainer) return;
 
-    window.getReviews()
+    window.getReviews() // Call the refactored window.getReviews
       .done(storedReviews => {
         reviewsListContainer.innerHTML = storedReviews.length > 0
           ? storedReviews.reverse().map(review => {
               const starsHtml = Array(review.rating).fill('<i class="bi bi-star-fill"></i>').join('') + Array(5 - review.rating).fill('<i class="bi bi-star"></i>').join('');
-              return `<div class="review-card" data-aos="fade-up"><div class="reviewer-info"><div class="avatar">${review.name.charAt(0).toUpperCase()}</div><div class="name-date"><h4>${review.name}</h4><span class="review-date">${review.date}</span></div><p class="product-name">Reviewed on: ${review.product}</p></div><div class="star-rating">${starsHtml}</div><p class="review-comment">${review.comment}</p></div>`;
+              return `<div class="review-card" data-aos="fade-up"><div class="reviewer-info"><div class="avatar">${review.name.charAt(0).toUpperCase()}</div><div class="name-date"><h4>${review.name}</h4><span class="review-date">${review.date}</span></div><p class="product-name">Reviewed on: ${review.product}</p><div class="star-rating">${starsHtml}</div><p class="review-comment">${review.comment}</p></div>`;
             }).join('')
           : '<p class="text-center no-reviews-message">No reviews yet. Be the first to share your experience!</p>';
       })
@@ -602,7 +617,7 @@ const initializeNavbarFeaturesAndListeners = () => {
               if (googleMessageElement) googleMessageElement.textContent = `Google: Signed in as ${profile.name}. Logging you in...`;
 
               // Call our internal authentication logic with the Google user payload
-              mockApi.googleAuth(profile)
+              googleAuthLogin(profile) // Use the refactored local function
                   .then(_processAuthSuccess)
                   .then(() => console.log("Google login/registration successful with KuihTradisi."))
                   .catch(error => {
@@ -635,15 +650,17 @@ const initializeNavbarFeaturesAndListeners = () => {
     currentUserId = getCookie('kuihTradisi_user_id') || DEFAULT_USER_ID;
     
     // 2. Load the appropriate cart into `localStorage.kuihTradisiCart` for the current session
+    // This now returns a Promise, but we don't need to chain from it immediately here.
     loadCartForCurrentUser(); 
 
     // 3. Load shared components (navbar, footer, product modal)
     // First, load navbar and footer using Promise.all (fetch)
     Promise.all([
       fetch('navbar.html').then(response => response.text()),
-      fetch('footer.html').then(response => response.text())
+      fetch('footer.html').then(response => response.text()),
+      fetch('product-modal.html').then(response => response.text()) // Fetch modal directly here
     ])
-    .then(([navbarData, footerData]) => {
+    .then(([navbarData, footerData, modalData]) => {
       document.getElementById('navbar-placeholder')?.
         insertAdjacentHTML('afterbegin', navbarData);
       initializeNavbarFeaturesAndListeners();
@@ -652,27 +669,16 @@ const initializeNavbarFeaturesAndListeners = () => {
         insertAdjacentHTML('afterbegin', footerData);
       initializeFooterFeaturesAndListeners();
 
-      // After navbar and footer are loaded, load the product modal using jQuery.load()
-      // The callback ensures initializeProductModalAndListeners and page-specific logic run AFTER modal is loaded.
-      // Make sure jQuery is loaded before this part.
-      if (typeof jQuery !== 'undefined') {
-          $('#product-modal-placeholder').load('product-modal.html', function(response, status, xhr) {
-              if (status == "error") {
-                  console.error("Error loading product-modal.html: " + xhr.status + " " + xhr.statusText);
-              } else {
-                  console.log("product-modal.html loaded successfully.");
-                  initializeProductModalAndListeners(); // Initialize modal features after it's in DOM
+      // Insert the modal HTML directly now
+      document.getElementById('product-modal-placeholder')?.
+        insertAdjacentHTML('afterbegin', modalData);
+      initializeProductModalAndListeners(); // Initialize modal features after it's in DOM
 
-                  // 4. Initialize page-specific scripts *after* all shared components are loaded
-                  if (selectBody.classList.contains('checkout-page')) populateCheckoutPage();
-                  if (selectBody.classList.contains('reviews-page')) populateReviewsPage();
-                  if (selectBody.classList.contains('menu-page')) setupMenuSearch();
-                  // The ratings.html page has its own inline script to populate product dropdown and handle submission.
-              }
-          });
-      } else {
-          console.error("jQuery is not loaded. Cannot use $.load() for product-modal.html.");
-      }
+      // 4. Initialize page-specific scripts *after* all shared components are loaded
+      if (selectBody.classList.contains('checkout-page')) populateCheckoutPage();
+      if (selectBody.classList.contains('reviews-page')) populateReviewsPage();
+      if (selectBody.classList.contains('menu-page')) setupMenuSearch();
+      // The ratings.html page has its own inline script to populate product dropdown and handle submission.
     })
     .catch(error => console.error('Error loading shared components:', error));
 
