@@ -8,7 +8,7 @@
     <meta name="description"
         content="Complete your purchase with KuihTradisi. Secure and easy checkout for your authentic Nyonya kuih order.">
     <meta name="keywords"
-        content="Nyonya kuih checkout, online payment, order summary, billing details, shipping, traditional Malaysian desserts">
+        content="Nyonya kuih checkout, online payment, order summary, billing details, shipping, traditional Malaysian Malaysian desserts">
 
     <!-- Favicons -->
     <link href="assets/img/favicon.png" rel="icon">
@@ -89,7 +89,8 @@
 
         .order-table th,
         .order-table td {
-            padding: 12px 0;
+            padding: 12px 5px;
+            /* Adjusted padding */
             border-bottom: 1px dashed color-mix(in srgb, var(--default-color), transparent 90%);
             font-family: var(--default-font);
             color: var(--default-color);
@@ -186,9 +187,9 @@
 
         /* Style for the remove button */
         .btn-danger-custom {
-            background-color: #cd7079;
+            background-color: #dc3545;
             /* Bootstrap red for danger */
-            border-color: #e63f4f;
+            border-color: #dc3545;
             color: #fff;
             padding: 5px 10px;
             font-size: 0.85rem;
@@ -203,17 +204,37 @@
             color: #fff;
         }
 
-        /* Adjust order table padding for the new column */
-        .order-table th,
-        .order-table td {
-            padding: 12px 5px;
-            /* Slightly adjust padding for all cells */
-        }
-
         .order-table th:last-child,
         .order-table td:last-child {
-            padding-right: 0;
-            /* Remove right padding for the last column */
+            padding-right: 5px;
+            /* Adjust right padding for the last column */
+        }
+
+        /* Added for AJAX feedback */
+        .order-feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            /* Hidden by default */
+        }
+
+        .order-feedback.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .order-feedback.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .order-feedback.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
     </style>
 </head>
@@ -254,22 +275,22 @@
                                 <tbody id="order-summary-items">
                                     <!-- Order items will be dynamically loaded here by JavaScript -->
                                     <tr>
-                                        <td colspan="3" class="text-center py-4">Your cart is empty. <a
+                                        <td colspan="4" class="text-center py-4">Your cart is empty. <a
                                                 href="menu.html">Shop now!</a></td>
                                     </tr>
                                 </tbody>
                                 <tfoot id="order-summary-totals">
                                     <!-- Order totals will be dynamically loaded here by JavaScript -->
                                     <tr>
-                                        <th colspan="2">Subtotal</th>
+                                        <th colspan="3">Subtotal</th>
                                         <td class="text-end">RM 0.00</td>
                                     </tr>
                                     <tr>
-                                        <th colspan="2">Shipping</th>
+                                        <th colspan="3">Shipping</th>
                                         <td class="text-end">RM 0.00</td>
                                     </tr>
                                     <tr>
-                                        <th colspan="2">Total</th>
+                                        <th colspan="3">Total</th>
                                         <td class="text-end">RM 0.00</td>
                                     </tr>
                                 </tfoot>
@@ -306,7 +327,8 @@
                                 </label>
                             </div>
 
-                            <button type="submit" class="btn btn-place-order">Place Order</button>
+                            <button type="submit" class="btn btn-place-order" id="placeOrderBtn">Place Order</button>
+                            <div class="order-feedback" id="orderFeedback"></div>
                         </div>
                     </div>
 
@@ -372,13 +394,6 @@
 
                                 <hr class="my-4">
 
-                                <div class="form-check mb-4">
-                                    <input type="checkbox" class="form-check-input" id="same-address">
-                                    <label class="form-check-label" for="same-address">&nbsp;&nbsp;Shipping address is
-                                        the same as
-                                        my billing address</label>
-                                </div>
-
                                 <h4 class="mb-3">Delivery / Pickup Information</h4>
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-6">
@@ -430,6 +445,32 @@
     <!-- Preloader -->
     <div id="preloader"></div>
 
+    <!-- NEW: Order Success Modal -->
+    <div class="modal fade" id="orderSuccessModal" tabindex="-1" aria-labelledby="orderSuccessModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 style="font-size: 2rem; text-align: center;" class="modal-title" id="orderSuccessModalLabel">
+                        Order Placed
+                        Successfully!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <p>Thank you for your purchase from KuihTradisi. Your order has been received and is being
+                        processed.</p>
+                    <p>You will receive an email confirmation shortly.</p>
+                    <p class="fst-italic">Redirecting you to the home page...</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Shopping</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END NEW: Order Success Modal -->
+
     <!-- Vendor JS Files (CDN & Local) - Keep these before main.js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery first -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -438,7 +479,7 @@
     <script src="https://cdn.jsdelivr.net/npm/purecounterjs@1.1.0/dist/purecounter_vanilla.js"></script>
     <!-- PureCounter CDN -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- jQuery is already loaded above, no need for redundant loading -->
 
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
@@ -452,6 +493,114 @@
                     this.classList.add('selected');
                     this.querySelector('input[type="radio"]').checked = true;
                 });
+            });
+
+            const orderSuccessModal = new bootstrap.Modal(document.getElementById('orderSuccessModal'), {
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            $('#placeOrderBtn').on('click', function (e) {
+                e.preventDefault();
+
+                const $placeOrderBtn = $(this);
+                const $orderFeedback = $('#orderFeedback');
+                const $checkoutForm = $('#checkoutForm');
+                const $termsCheckbox = $('#termsAndConditions');
+
+                // Form validation
+                if (!$checkoutForm[0].checkValidity()) {
+                    $checkoutForm[0].reportValidity();
+                    $orderFeedback.removeClass().addClass('order-feedback error').text('Please fill in all required billing and delivery details.').fadeIn();
+                    return;
+                }
+                if (!$termsCheckbox.prop('checked')) {
+                    $orderFeedback.removeClass().addClass('order-feedback error').text('You must agree to the Terms and Conditions to place an order.').fadeIn();
+                    return;
+                }
+
+                // Gather billing/delivery data
+                const billingDetails = {};
+                $checkoutForm.find('input, select, textarea').each(function () {
+                    const $field = $(this);
+                    billingDetails[$field.attr('id')] = $field.is(':checkbox') ? $field.prop('checked') : $field.val();
+                });
+
+                // Gather payment and cart data
+                const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+                const cartItems = window.getCart();
+
+                // Calculate totals (re-calculated to be self-contained)
+                let subtotal = 0;
+                cartItems.forEach(item => {
+                    subtotal += item.unitPrice * item.quantity;
+                });
+                const shippingCost = 10.00; // From SHIPPING_FLAT_RATE in main.js
+                const totalAmount = subtotal + shippingCost;
+
+                const orderData = {
+                    billingDetails: billingDetails,
+                    paymentMethod: paymentMethod,
+                    cartItems: cartItems,
+                    orderSummary: {
+                        subtotal: subtotal.toFixed(2),
+                        shipping: shippingCost.toFixed(2),
+                        total: totalAmount.toFixed(2)
+                    },
+                    orderDate: new Date().toISOString()
+                };
+
+                // Disable button and show loading feedback
+                $placeOrderBtn.prop('disabled', true).text('Placing Order...');
+                $orderFeedback.removeClass().addClass('order-feedback info').text('Processing your order...').fadeIn();
+
+                // Imaginary URL for the POST request
+                const mockAPIurl = 'https://68ac62797a0bbe92cbba425d.mockapi.io/placed-order';
+
+                // --- Using $.post() ---
+                $.post(mockAPIurl, orderData, function (response) {
+                    // This function is executed on a successful POST request (HTTP status 200 OK)
+                    // Note: $.post() assumes 'json' dataType by default if it looks like JSON.
+                    // If your imaginary server always returns JSON, it should be parsed automatically.
+                    console.log('Order placed successfully (simulated via $.post):', response);
+
+                    $orderFeedback.removeClass().addClass('order-feedback success').text('Order successfully processed!').fadeIn();
+
+                    window.saveCart([]); // Clear the cart
+                    sessionStorage.removeItem('checkoutFormData'); // Clear billing/delivery details
+
+                    orderSuccessModal.show(); // Show success modal
+
+                    setTimeout(() => {
+                        window.location.href = 'index.html'; // Redirect
+                    }, 3000);
+
+                }, 'json') // Specify 'json' as expected data type for response
+                    .fail(function (xhr, status, error) {
+                        // This function is executed on a failed POST request
+                        console.error('Error placing order ($.post):', status, error, xhr.responseText);
+                        let errorMessage = 'Failed to place order. Please try again.';
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorMessage;
+                        } catch (e) {
+                            // ignore parsing error
+                        }
+                        $orderFeedback.removeClass().addClass('order-feedback error').text(errorMessage).fadeIn();
+                        $placeOrderBtn.prop('disabled', false).text('Place Order');
+                    })
+                    .always(function () {
+                        // This block runs regardless of success or error
+                        // You might want to re-enable the button only on error if not redirecting
+                    });
+                // --- End $.post() ---
+            });
+
+            // Optional: Event listener for when the modal is hidden
+            $('#orderSuccessModal').on('hidden.bs.modal', function () {
+                // If the user manually closes the modal, and we haven't redirected yet,
+                // this might be a good place to redirect, or allow them to continue shopping.
+                // For this example, auto-redirect takes precedence.
             });
         });
     </script>
