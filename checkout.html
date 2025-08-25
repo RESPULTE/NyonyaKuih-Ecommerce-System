@@ -52,6 +52,19 @@
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             border: 1px solid color-mix(in srgb, var(--accent-color), transparent 80%);
+            /* Enable flexbox for reordering children */
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            /* Important for `mt-auto` to work */
+        }
+
+        /* Styling for the payment method images */
+        .payment-methods img {
+            height: 30px;
+            /* Adjust as needed */
+            vertical-align: middle;
+            margin-left: 10px;
         }
 
         .checkout-form-container h3,
@@ -258,82 +271,89 @@
             <div class="container" data-aos="fade-up" data-aos-delay="100">
                 <div class="row gy-4">
 
-                    <!-- Right Column: Your Order & Payment - Now first on small screens -->
-                    <div class="col-lg-5 order-1 order-lg-2">
-                        <div class="order-summary-container">
-                            <h3>Your Order</h3>
+                    <!-- Right Column: Your Order & Payment - Now second on small screens -->
+                    <div class="col-lg-5 order-2 order-lg-2 h-100">
+                        <div class="order-summary-container d-flex flex-column h-100">
+                            <!-- Order Summary Table (order-1 on mobile) -->
+                            <div class="order-1">
+                                <h3>Your Order</h3>
+                                <table class="table order-table mb-4 ">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Product</th>
+                                            <th scope="col" class="text-center">Qty</th>
+                                            <th scope="col" class="text-end">Subtotal</th>
+                                            <th scope="col" class="text-end"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="order-summary-items">
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4">Your cart is empty. <a
+                                                    href="menu.html">Shop now!</a></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot id="order-summary-totals">
+                                        <tr>
+                                            <th colspan="3">Subtotal</th>
+                                            <td class="text-end">RM 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="3">Shipping</th>
+                                            <td class="text-end">RM 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="3">Total</th>
+                                            <td class="text-end">RM 0.00</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
 
-                            <table class="table order-table mb-4">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Product</th>
-                                        <th scope="col" class="text-center">Qty</th>
-                                        <th scope="col" class="text-end">Subtotal</th>
-                                        <th scope="col" class="text-end"></th> <!-- New column for Remove button -->
-                                    </tr>
-                                </thead>
-                                <tbody id="order-summary-items">
-                                    <!-- Order items will be dynamically loaded here by JavaScript -->
-                                    <tr>
-                                        <td colspan="4" class="text-center py-4">Your cart is empty. <a
-                                                href="menu.html">Shop now!</a></td>
-                                    </tr>
-                                </tbody>
-                                <tfoot id="order-summary-totals">
-                                    <!-- Order totals will be dynamically loaded here by JavaScript -->
-                                    <tr>
-                                        <th colspan="3">Subtotal</th>
-                                        <td class="text-end">RM 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <th colspan="3">Shipping</th>
-                                        <td class="text-end">RM 0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <th colspan="3">Total</th>
-                                        <td class="text-end">RM 0.00</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-
-                            <h4 class="mb-3">Payment Method</h4>
-                            <div class="payment-methods">
-                                <div class="payment-option selected" data-payment-method="touchngo">
-                                    <input type="radio" name="paymentMethod" id="paymenttouchngo" value="touchngo"
-                                        checked>
-                                    <label for="paymenttouchngo">
-                                        TouchnGo e-wallet &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img
-                                            src="assets/img/touchngo.png" alt="touchngo Logo" height="40" class="ms-2">
-                                    </label>
+                            <!-- Payment Method section (order-2 on mobile) -->
+                            <div class="order-2 mt-3">
+                                <h4 class="mb-3">Payment Method</h4>
+                                <div class="payment-methods">
+                                    <div class="payment-option selected" data-payment-method="touchngo">
+                                        <input type="radio" name="paymentMethod" id="paymenttouchngo" value="touchngo"
+                                            checked>
+                                        <label for="paymenttouchngo">
+                                            TouchnGo e-wallet &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img
+                                                src="assets/img/touchngo.png" alt="touchngo Logo" height="40"
+                                                class="ms-2">
+                                        </label>
+                                    </div>
+                                    <div class="payment-option" data-payment-method="fpx">
+                                        <input type="radio" name="paymentMethod" id="paymentFPX" value="fpx">
+                                        <label for="paymentFPX">
+                                            FPX Online Banking <img src="assets/img/fpx.png" alt="FPX Logo" height="40"
+                                                class="ms-2">
+                                        </label>
+                                    </div>
                                 </div>
-                                <div class="payment-option" data-payment-method="fpx">
-                                    <input type="radio" name="paymentMethod" id="paymentFPX" value="fpx">
-                                    <label for="paymentFPX">
-                                        FPX Online Banking <img src="assets/img/fpx.png" alt="FPX Logo" height="40"
-                                            class="ms-2">
-                                    </label>
-                                </div>
-                                <!-- Add other payment methods as needed -->
                             </div>
 
                             <hr class="my-4">
 
-                            <div class="form-check mb-3">
-                                <input type="checkbox" class="form-check-input" id="termsAndConditions" required>
-                                <label class="form-check-label" for="termsAndConditions">
-                                    &nbsp;I have read and agree to the website <a href="about.html#terms-of-use"
-                                        target="_blank" class="text-decoration-none">Terms and Conditions</a> <span
-                                        class="text-danger">*</span>
-                                </label>
-                            </div>
+                            <!-- Terms, Button, Feedback (order-3 on mobile, but order-last for md and up) -->
+                            <div class="order-3 order-md-last mt-auto">
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" class="form-check-input" id="termsAndConditions" required>
+                                    <label class="form-check-label" for="termsAndConditions">
+                                        &nbsp;I have read and agree to the website <a href="about.html#terms-of-use"
+                                            target="_blank" class="text-decoration-none">Terms and Conditions</a> <span
+                                            class="text-danger">*</span>
+                                    </label>
+                                </div>
 
-                            <button type="submit" class="btn btn-place-order" id="placeOrderBtn">Place Order</button>
-                            <div class="order-feedback" id="orderFeedback"></div>
+                                <button type="submit" class="btn btn-place-order" id="placeOrderBtn">Place
+                                    Order</button>
+                                <div class="order-feedback" id="orderFeedback"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Left Column: Billing & Delivery Details - Now second on small screens -->
-                    <div class="col-lg-7 order-2 order-lg-1">
+                    <!-- Left Column: Billing & Delivery Details - Now first on small screens -->
+                    <div class="col-lg-7 order-1 order-lg-1">
                         <div class="checkout-form-container">
                             <h3>Billing & Delivery Details</h3>
                             <form id="checkoutForm">
@@ -393,6 +413,13 @@
                                 </div>
 
                                 <hr class="my-4">
+
+                                <div class="form-check mb-4">
+                                    <input type="checkbox" class="form-check-input" id="same-address">
+                                    <label class="form-check-label" for="same-address">&nbsp;&nbsp;Shipping address is
+                                        the same as
+                                        my billing address</label>
+                                </div>
 
                                 <h4 class="mb-3">Delivery / Pickup Information</h4>
                                 <div class="row g-3 mb-4">
