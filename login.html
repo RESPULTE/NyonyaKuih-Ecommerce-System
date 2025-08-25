@@ -1,3 +1,5 @@
+--- START OF FILE login.html ---
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -72,8 +74,7 @@
             box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 70%);
         }
 
-        .btn-login,
-        .btn-facebook-login {
+        .btn-login {
             background-color: var(--accent-color);
             border-color: var(--accent-color);
             color: var(--contrast-color);
@@ -85,25 +86,9 @@
             width: 100%;
         }
 
-        .btn-login:hover,
-        .btn-facebook-login:hover {
+        .btn-login:hover {
             background-color: color-mix(in srgb, var(--accent-color), black 10%);
             border-color: color-mix(in srgb, var(--accent-color), black 10%);
-        }
-
-        .btn-facebook-login {
-            background-color: #3b5998;
-            border-color: #3b5998;
-            margin-top: 15px;
-        }
-
-        .btn-facebook-login:hover {
-            background-color: color-mix(in srgb, #3b5998, black 10%);
-            border-color: color-mix(in srgb, #3b5998, black 10%);
-        }
-
-        .btn-facebook-login i {
-            margin-right: 10px;
         }
 
         .login-form-container p {
@@ -115,10 +100,35 @@
             color: var(--accent-color);
             font-weight: 600;
         }
+
+        /* Custom styling for Google Sign-In button to fit theme if using custom render */
+        .g_id_signin div[aria-labelledby^="gsi_42"] {
+            /* Target Google's rendered button specifically */
+            width: 100% !important;
+            /* Make Google button span full width of its container */
+            height: 48px;
+            /* Match btn-login height */
+            line-height: 48px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            /* Match btn-login border-radius */
+            /* You can further customize button appearance here if Google allows,
+               but direct overrides on its shadow DOM can be tricky. */
+        }
     </style>
 </head>
 
 <body class="login-page">
+
+    <!-- Google Identity Services (GIS) SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Google One Tap / Sign-in prompt container -->
+    <!-- This div is used to initialize the Google Identity Services client -->
+    <div id="g_id_onload" data-client_id="498870406314-5vta068haudn70tqjmm3q7cv3am50lht.apps.googleusercontent.com"
+        data-callback="onGoogleSignIn" data-context="signin" data-auto_select="true" data-auto="true">
+    </div>
 
     <!-- Navbar will be loaded here by JavaScript -->
     <div id="navbar-placeholder"></div>
@@ -157,10 +167,14 @@
 
                             <hr class="my-4">
 
-                            <h3>Or Login with Facebook</h3>
-                            <button id="facebookLoginBtn" class="btn btn-facebook-login">
-                                <i class="bi bi-facebook"></i> Continue with Facebook
-                            </button>
+                            <h3>Or Login with Google</h3>
+                            <!-- Google Sign-In button container -->
+                            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                                data-text="continue_with" data-shape="rectangular" data-logo_alignment="left"
+                                data-width="100%">
+                            </div>
+                            <div id="googleLoginMessage" class="mt-3 text-center text-success" style="display: none;">
+                            </div>
 
                             <p>Don't have an account? <a href="register.html">Register here</a></p>
                         </div>
@@ -183,7 +197,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery first -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.css"></script>
     <script src="https://cdn.jsdelivr.net/npm/purecounterjs@1.1.0/dist/purecounter_vanilla.js"></script>
     <!-- PureCounter CDN -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
@@ -196,7 +210,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const loginForm = document.getElementById('loginForm');
-            const facebookLoginBtn = document.getElementById('facebookLoginBtn');
             const loginMessage = document.getElementById('loginMessage');
 
             loginForm.addEventListener('submit', function (e) {
@@ -204,69 +217,30 @@
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
 
+                loginMessage.style.display = 'block'; // Ensure message is visible
+
                 // Call the global loginUser function from main.js
-                // It now returns a Promise/Deferred object
                 if (typeof window.loginUser === 'function') {
                     window.loginUser(email, password)
                         .then(success => {
                             if (success) {
-                                loginMessage.textContent = "Login successful! Redirecting to home page...";
+                                loginMessage.textContent = "Login successful! Redirecting...";
                                 loginMessage.className = "mt-3 text-center text-success";
-                                loginMessage.style.display = "block";
-                                setTimeout(() => {
-                                    window.location.href = 'index.html';
-                                }, 1500);
+                                // Redirection is now handled by _processAuthSuccess in main.js
                             } else {
                                 loginMessage.textContent = "Invalid email or password.";
                                 loginMessage.className = "mt-3 text-center text-danger";
-                                loginMessage.style.display = "block";
                             }
                         })
                         .catch(error => {
                             loginMessage.textContent = error.message || "An unexpected error occurred during login.";
                             loginMessage.className = "mt-3 text-center text-danger";
-                            loginMessage.style.display = "block";
                             console.error("Login attempt failed:", error);
                         });
                 } else {
                     loginMessage.textContent = "Error: Login function not available.";
                     loginMessage.className = "mt-3 text-center text-danger";
-                    loginMessage.style.display = "block";
                     console.error("window.loginUser function not found.");
-                }
-            });
-
-            facebookLoginBtn.addEventListener('click', function () {
-                // Call the global registerOrLoginWithFacebook function from main.js
-                // It now returns a Promise/Deferred object
-                if (typeof window.registerOrLoginWithFacebook === 'function') {
-                    window.registerOrLoginWithFacebook()
-                        .then(success => {
-                            if (success) {
-                                loginMessage.textContent = "Logged in with Facebook! Redirecting to home page...";
-                                loginMessage.className = "mt-3 text-center text-success";
-                                loginMessage.style.display = "block";
-                                setTimeout(() => {
-                                    window.location.href = 'index.html';
-                                }, 1500);
-                            } else {
-                                // This branch should ideally not be reached if mockApi.facebookAuth always resolves
-                                loginMessage.textContent = "Facebook login failed unexpectedly.";
-                                loginMessage.className = "mt-3 text-center text-danger";
-                                loginMessage.style.display = "block";
-                            }
-                        })
-                        .catch(error => {
-                            loginMessage.textContent = error.message || "An unexpected error occurred during Facebook login.";
-                            loginMessage.className = "mt-3 text-center text-danger";
-                            loginMessage.style.display = "block";
-                            console.error("Facebook login attempt failed:", error);
-                        });
-                } else {
-                    loginMessage.textContent = "Error: Facebook login function not available.";
-                    loginMessage.className = "mt-3 text-center text-danger";
-                    loginMessage.style.display = "block";
-                    console.error("window.registerOrLoginWithFacebook function not found.");
                 }
             });
         });

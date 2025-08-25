@@ -73,8 +73,7 @@
             box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 70%);
         }
 
-        .btn-register,
-        .btn-facebook-register {
+        .btn-register {
             background-color: var(--accent-color);
             border-color: var(--accent-color);
             color: var(--contrast-color);
@@ -86,25 +85,9 @@
             width: 100%;
         }
 
-        .btn-register:hover,
-        .btn-facebook-register:hover {
+        .btn-register:hover {
             background-color: color-mix(in srgb, var(--accent-color), black 10%);
             border-color: color-mix(in srgb, var(--accent-color), black 10%);
-        }
-
-        .btn-facebook-register {
-            background-color: #3b5998;
-            border-color: #3b5998;
-            margin-top: 15px;
-        }
-
-        .btn-facebook-register:hover {
-            background-color: color-mix(in srgb, #3b5998, black 10%);
-            border-color: color-mix(in srgb, #3b5998, black 10%);
-        }
-
-        .btn-facebook-register i {
-            margin-right: 10px;
         }
 
         .register-form-container p {
@@ -116,10 +99,35 @@
             color: var(--accent-color);
             font-weight: 600;
         }
+
+        /* Custom styling for Google Sign-In button to fit theme if using custom render */
+        .g_id_signin div[aria-labelledby^="gsi_42"] {
+            /* Target Google's rendered button specifically */
+            width: 100% !important;
+            /* Make Google button span full width of its container */
+            height: 48px;
+            /* Match btn-register height */
+            line-height: 48px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            /* Match btn-register border-radius */
+            /* You can further customize button appearance here if Google allows,
+               but direct overrides on its shadow DOM can be tricky. */
+        }
     </style>
 </head>
 
 <body class="register-page">
+
+    <!-- Google Identity Services (GIS) SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Google One Tap / Sign-in prompt container -->
+    <!-- This div is used to initialize the Google Identity Services client -->
+    <div id="g_id_onload" data-client_id="498870406314-5vta068haudn70tqjmm3q7cv3am50lht.apps.googleusercontent.com"
+        data-callback="onGoogleSignIn" data-context="signup" data-auto_select="true" data-auto="true">
+    </div>
 
     <!-- Navbar will be loaded here by JavaScript -->
     <div id="navbar-placeholder"></div>
@@ -169,10 +177,14 @@
 
                             <hr class="my-4">
 
-                            <h3>Or Register with Facebook</h3>
-                            <button id="facebookRegisterBtn" class="btn btn-facebook-register">
-                                <i class="bi bi-facebook"></i> Continue with Facebook
-                            </button>
+                            <h3>Or Register with Google</h3>
+                            <!-- Google Sign-In button container -->
+                            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                                data-text="signup_with" data-shape="rectangular" data-logo_alignment="left"
+                                data-width="100%">
+                            </div>
+                            <div id="googleLoginMessage" class="mt-3 text-center text-success" style="display: none;">
+                            </div>
 
                             <p>Already have an account? <a href="login.html">Login here</a></p>
                         </div>
@@ -194,7 +206,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery first -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.css"></script>
     <script src="https://cdn.jsdelivr.net/npm/purecounterjs@1.1.0/dist/purecounter_vanilla.js"></script>
     <!-- PureCounter CDN -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
@@ -206,7 +218,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const registerForm = document.getElementById('registerForm');
-            const facebookRegisterBtn = document.getElementById('facebookRegisterBtn');
             const registerMessage = document.getElementById('registerMessage');
 
             registerForm.addEventListener('submit', function (e) {
@@ -216,77 +227,37 @@
                 const password = document.getElementById('registerPassword').value;
                 const confirmPassword = document.getElementById('confirmPassword').value;
 
+                registerMessage.style.display = 'block'; // Ensure message is visible
+
                 if (password !== confirmPassword) {
                     registerMessage.textContent = "Passwords do not match.";
                     registerMessage.className = "mt-3 text-center text-danger";
-                    registerMessage.style.display = "block";
                     return;
                 }
 
                 // Call the global registerUser function from main.js
-                // It now returns a Promise/Deferred object
                 if (typeof window.registerUser === 'function') {
                     window.registerUser(email, password, name)
                         .then(success => {
                             if (success) {
-                                registerMessage.textContent = "Registration successful! Redirecting to home page...";
+                                registerMessage.textContent = "Registration successful! Redirecting...";
                                 registerMessage.className = "mt-3 text-center text-success";
-                                registerMessage.style.display = "block";
-                                setTimeout(() => {
-                                    window.location.href = 'index.html'; // Redirect after successful login
-                                }, 1500);
+                                // Redirection is now handled by _processAuthSuccess in main.js
                             } else {
                                 // This branch is hit if the username (email) already exists
                                 registerMessage.textContent = "An account with this email already exists. Please login.";
                                 registerMessage.className = "mt-3 text-center text-danger";
-                                registerMessage.style.display = "block";
                             }
                         })
                         .catch(error => {
                             registerMessage.textContent = error.message || "An unexpected error occurred during registration.";
                             registerMessage.className = "mt-3 text-center text-danger";
-                            registerMessage.style.display = "block";
                             console.error("Registration attempt failed:", error);
                         });
                 } else {
                     registerMessage.textContent = "Error: Registration function not available.";
                     registerMessage.className = "mt-3 text-center text-danger";
-                    registerMessage.style.display = "block";
                     console.error("window.registerUser function not found.");
-                }
-            });
-
-            facebookRegisterBtn.addEventListener('click', function () {
-                // Call the global registerOrLoginWithFacebook function from main.js
-                // It now returns a Promise/Deferred object
-                if (typeof window.registerOrLoginWithFacebook === 'function') {
-                    window.registerOrLoginWithFacebook()
-                        .then(success => {
-                            if (success) {
-                                registerMessage.textContent = "Registered and logged in with Facebook! Redirecting to home page...";
-                                registerMessage.className = "mt-3 text-center text-success";
-                                registerMessage.style.display = "block";
-                                setTimeout(() => {
-                                    window.location.href = 'index.html';
-                                }, 1500);
-                            } else {
-                                // This branch should ideally not be reached if mockApi.facebookAuth always resolves
-                                registerMessage.textContent = "Facebook registration failed unexpectedly.";
-                                registerMessage.className = "mt-3 text-center text-danger";
-                                registerMessage.style.display = "block";
-                            }
-                        })
-                        .catch(error => {
-                            registerMessage.textContent = error.message || "An unexpected error occurred during Facebook registration.";
-                            registerMessage.className = "mt-3 text-center text-danger";
-                            registerMessage.style.display = "block";
-                            console.error("Facebook registration attempt failed:", error);
-                        });
-                } else {
-                    registerMessage.textContent = "Error: Facebook registration function not available.";
-                    registerMessage.className = "mt-3 text-center text-danger";
-                    registerMessage.style.display = "block";
-                    console.error("window.registerOrLoginWithFacebook function not found.");
                 }
             });
         });

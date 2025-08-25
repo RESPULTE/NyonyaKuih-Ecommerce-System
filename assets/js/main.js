@@ -15,6 +15,17 @@
   const DEFAULT_USER_ID = 'guest'; // Unique ID for guest user
   let currentUserId = DEFAULT_USER_ID; // Tracks current user based on cookie/default
 
+  // Helper to decode JWT token (for client-side verification of Google ID token)
+  // WARNING: Client-side verification is NOT secure for production.
+  function decodeJwtResponse(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  }
+
   // Helper to ensure user data consistency when reading from localStorage
   function _normalizeUserData(user) {
       user.username = user.username || user.email; // Ensure username exists
@@ -64,8 +75,36 @@
       return deferred.promise();
     },
 
-    // Removed facebookAuth as Facebook login is no longer supported
-    // facebookAuth: function(fbUser) { /* ... */ },
+    // NEW: Google Auth mock API
+    googleAuth: function(googleUserPayload) {
+        const deferred = $.Deferred();
+        setTimeout(() => {
+            const userId = 'google_' + googleUserPayload.sub; // Use Google's unique 'sub' ID
+            const username = googleUserPayload.email;
+            const displayName = googleUserPayload.name || googleUserPayload.email.split('@')[0];
+
+            let users = _getRawData('kuihTradisiUsers');
+            let user = users.find(u => u.username === username);
+
+            if (!user) {
+                // Register new Google user
+                user = { id: userId, username: username, displayName: displayName, password: 'GOOGLE_NO_PASSWORD', cart: [], discount: true };
+                users.push(user);
+                _saveRawData('kuihTradisiUsers', users);
+                console.log("Mock API: New Google user registered.");
+            } else {
+                // Update existing user's ID if it changed (e.g., if they were guest and then logged in with Google)
+                // Or simply log in existing user.
+                user.id = userId; // Ensure ID matches Google ID
+                // Optionally update displayName if Google provides a better one
+                user.displayName = displayName;
+                _saveRawData('kuihTradisiUsers', users);
+                console.log("Mock API: Existing Google user logged in.");
+            }
+            deferred.resolve(user);
+        }, this._delay);
+        return deferred.promise();
+    },
 
     getCart: function(userId) {
       const deferred = $.Deferred();
@@ -155,7 +194,14 @@
     updateAccountDropdown();
     updateCartIndicator();
 
-    // No Facebook SDK to log out from
+    // NEW: Sign out from Google Identity Services if user is logged in
+    if (typeof google !== 'undefined' && google.accounts.id) {
+        google.accounts.id.disableAutoSelect(); // Prevent One Tap from showing on next load
+        // Note: GIS doesn't have a direct "logout from this website's Google session" API
+        // as it's primarily about authenticating with Google, not managing a session.
+        // Clearing our own cookie and disabling auto-select is the main client-side action.
+        console.log("Google auto-select disabled for next login.");
+    }
 
     const currentPage = window.location.pathname.split('/').pop();
     const userSpecificPages = ['checkout.html', 'ratings.html', 'reviews.html', 'login.html', 'register.html'];
@@ -402,7 +448,7 @@ const initializeNavbarFeaturesAndListeners = () => {
     });
   };
 
-  // NEW: Social Media Sharing Logic (WhatsApp, Telegram, X)
+  // Social Media Sharing Logic (WhatsApp, Telegram, X)
   const setupSocialShareListeners = () => {
       // WhatsApp Share
       $(document).on('click', '.btn-whatsapp-share', function() {
@@ -437,7 +483,7 @@ const initializeNavbarFeaturesAndListeners = () => {
           window.open(xShareUrl, '_blank', 'width=600,height=400');
       });
   };
-  // END NEW: Social Media Sharing Logic
+  // END Social Media Sharing Logic
 
   const populateCheckoutPage = () => {
     const cart = window.getCart();
@@ -539,7 +585,44 @@ const initializeNavbarFeaturesAndListeners = () => {
   };
   // --- END PAGE-SPECIFIC LOGIC ---
 
-  // Removed all Facebook SDK integration from main.js
+  // --- GOOGLE IDENTITY SERVICES (GIS) INTEGRATION ---
+  window.onGoogleSignIn = function(response) {
+      console.log('Google Sign-In response received:', response);
+      const googleMessageElement = document.getElementById('googleLoginMessage');
+      if (googleMessageElement) {
+          googleMessageElement.style.display = 'block'; // Ensure message is visible
+      }
+
+      if (response.credential) {
+          try {
+              // Decode the JWT token to get user details
+              const profile = decodeJwtResponse(response.credential);
+              console.log('Google User Payload:', profile);
+
+              if (googleMessageElement) googleMessageElement.textContent = `Google: Signed in as ${profile.name}. Logging you in...`;
+
+              // Call our internal authentication logic with the Google user payload
+              mockApi.googleAuth(profile)
+                  .then(_processAuthSuccess)
+                  .then(() => console.log("Google login/registration successful with KuihTradisi."))
+                  .catch(error => {
+                      if (googleMessageElement) googleMessageElement.textContent = error.message || "Google login failed: An unexpected error occurred.";
+                      googleMessageElement.className = "mt-3 text-center text-danger";
+                      console.error("Google login failed for KuihTradisi:", error);
+                  });
+          } catch (error) {
+              if (googleMessageElement) googleMessageElement.textContent = "Google login failed: Could not decode token.";
+              googleMessageElement.className = "mt-3 text-center text-danger";
+              console.error("Failed to decode Google ID token:", error);
+          }
+      } else {
+          // User cancelled or dismissed the Google prompt
+          console.warn("Google sign-in cancelled or no credential received.");
+          if (googleMessageElement) googleMessageElement.textContent = "Google sign-in cancelled.";
+          googleMessageElement.className = "mt-3 text-center text-warning";
+      }
+  };
+  // --- END GOOGLE IDENTITY SERVICES (GIS) INTEGRATION ---
 
 
   /**
