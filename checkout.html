@@ -414,13 +414,6 @@
 
                                 <hr class="my-4">
 
-                                <div class="form-check mb-4">
-                                    <input type="checkbox" class="form-check-input" id="same-address">
-                                    <label class="form-check-label" for="same-address">&nbsp;&nbsp;Shipping address is
-                                        the same as
-                                        my billing address</label>
-                                </div>
-
                                 <h4 class="mb-3">Delivery / Pickup Information</h4>
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-6">
@@ -527,6 +520,81 @@
                 keyboard: false
             });
 
+            // Make these functions global or attach them to a global object if main.js needs to call them
+            window.saveCheckoutFormData = () => {
+                const form = $('#checkoutForm');
+                if (!form.length) return;
+                const formData = {};
+                form.find('input, select, textarea').each(function () {
+                    formData[this.id] = $(this).is(':checkbox') ? $(this).prop('checked') : $(this).val();
+                });
+                sessionStorage.setItem('checkoutFormData', JSON.stringify(formData));
+                console.log("Checkout form data saved to sessionStorage.");
+            };
+
+            window.loadCheckoutFormData = () => {
+                const form = $('#checkoutForm');
+                if (!form.length) return;
+                const savedData = JSON.parse(sessionStorage.getItem('checkoutFormData'));
+                if (!savedData) return;
+                form.find('input, select, textarea').each(function () {
+                    if (savedData[this.id] !== undefined) {
+                        $(this).is(':checkbox') ? $(this).prop('checked', savedData[this.id]) : $(this).val(savedData[this.id]);
+                    }
+                });
+                console.log("Checkout form data loaded from sessionStorage.");
+            };
+
+            // This function is now exposed globally for main.js to call if the page class matches
+            window.initializeCheckoutPage = (shippingFlatRate) => {
+                const cart = window.getCart();
+                const orderItemsBody = $('#order-summary-items');
+                const orderTotalsFooter = $('#order-summary-totals');
+                if (!orderItemsBody.length || !orderTotalsFooter.length) return;
+
+                orderItemsBody.empty(); // Clear existing items
+                let subtotal = 0;
+                const shipping = shippingFlatRate; // Use the value passed from main.js
+
+                if (cart.length === 0) {
+                    orderItemsBody.html('<tr><td colspan="4" class="text-center py-4">Your cart is empty. <a href="menu.html">Shop now!</a></td></tr>');
+                } else {
+                    cart.forEach(item => {
+                        const itemTotal = item.unitPrice * item.quantity;
+                        subtotal += itemTotal;
+                        orderItemsBody.append(`
+                            <tr>
+                                <td class="product-name">${item.name} (${item.packagingOption})</td>
+                                <td class="text-center">${item.quantity}</td>
+                                <td class="product-total">RM ${itemTotal.toFixed(2)}</td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-sm btn-danger-custom remove-item-btn" data-item-id="${item.id}">Remove</button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+
+                    // Add event listeners for the remove buttons after they are added to the DOM
+                    $('.remove-item-btn').on('click', function () {
+                        const itemId = $(this).data('itemId');
+                        window.deleteCartItem(itemId); // Global function in main.js
+                    });
+                }
+
+                const total = subtotal + shipping;
+                orderTotalsFooter.html(`
+                    <tr><th colspan="3">Subtotal</th><td class="text-end">RM ${subtotal.toFixed(2)}</td></tr>
+                    <tr><th colspan="3">Shipping</th><td class="text-end">RM ${shipping.toFixed(2)}</td></tr>
+                    <tr><th colspan="3">Total</th><td class="text-end"><strong>RM ${total.toFixed(2)}</strong></td></tr>
+                `);
+
+                window.loadCheckoutFormData();
+                $('#checkoutForm').find('input, select, textarea').off('change input').on('change input', window.saveCheckoutFormData);
+            };
+
+            // Call initial population when the page is ready and main.js has loaded shared components.
+            // main.js will now call window.initializeCheckoutPage() after loading dynamic content.
+
             $('#placeOrderBtn').on('click', function (e) {
                 e.preventDefault();
 
@@ -534,7 +602,7 @@
                 const $orderFeedback = $('#orderFeedback');
                 const $checkoutForm = $('#checkoutForm');
                 const $termsCheckbox = $('#termsAndConditions');
-                const cartItems = window.getCart();
+                const cartItems = window.getCart(); // Global function from main.js
 
                 // Form validation
                 if (!$checkoutForm[0].checkValidity()) {
@@ -552,7 +620,6 @@
                     return;
                 }
 
-
                 // Gather billing/delivery data
                 const billingDetails = {};
                 $checkoutForm.find('input, select, textarea').each(function () {
@@ -568,7 +635,7 @@
                 cartItems.forEach(item => {
                     subtotal += item.unitPrice * item.quantity;
                 });
-                const shippingCost = 10.00; // From SHIPPING_FLAT_RATE in main.js
+                const shippingCost = 10.00; // Hardcoded here for page-specific logic, but derived from main.js constant for clarity
                 const totalAmount = subtotal + shippingCost;
 
                 const orderData = {
@@ -587,19 +654,14 @@
                 $placeOrderBtn.prop('disabled', true).text('Placing Order...');
                 $orderFeedback.removeClass().addClass('order-feedback info').text('Processing your order...').fadeIn();
 
-                // Imaginary URL for the POST request
                 const mockAPIurl = 'https://68ac62797a0bbe92cbba425d.mockapi.io/placed-order';
 
-                // --- Using $.post() ---
                 $.post(mockAPIurl, orderData, function (response) {
-                    // This function is executed on a successful POST request (HTTP status 200 OK)
-                    // Note: $.post() assumes 'json' dataType by default if it looks like JSON.
-                    // If your imaginary server always returns JSON, it should be parsed automatically.
                     console.log('Order placed successfully (simulated via $.post):', response);
 
                     $orderFeedback.removeClass().addClass('order-feedback success').text('Order successfully processed!').fadeIn();
 
-                    window.saveCart([]); // Clear the cart
+                    window.saveCart([]); // Global function from main.js (clears the cart)
                     sessionStorage.removeItem('checkoutFormData'); // Clear billing/delivery details
 
                     orderSuccessModal.show(); // Show success modal
@@ -608,9 +670,8 @@
                         window.location.href = 'index.html'; // Redirect
                     }, 3000);
 
-                }, 'json') // Specify 'json' as expected data type for response
+                }, 'json')
                     .fail(function (xhr, status, error) {
-                        // This function is executed on a failed POST request
                         console.error('Error placing order ($.post):', status, error, xhr.responseText);
                         let errorMessage = 'Failed to place order. Please try again.';
                         try {
@@ -621,19 +682,7 @@
                         }
                         $orderFeedback.removeClass().addClass('order-feedback error').text(errorMessage).fadeIn();
                         $placeOrderBtn.prop('disabled', false).text('Place Order');
-                    })
-                    .always(function () {
-                        // This block runs regardless of success or error
-                        // You might want to re-enable the button only on error if not redirecting
                     });
-                // --- End $.post() ---
-            });
-
-            // Optional: Event listener for when the modal is hidden
-            $('#orderSuccessModal').on('hidden.bs.modal', function () {
-                // If the user manually closes the modal, and we haven't redirected yet,
-                // this might be a good place to redirect, or allow them to continue shopping.
-                // For this example, auto-redirect takes precedence.
             });
         });
     </script>

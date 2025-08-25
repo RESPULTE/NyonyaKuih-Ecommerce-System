@@ -220,15 +220,10 @@
                 // Call the global loginUser function from main.js
                 if (typeof window.loginUser === 'function') {
                     window.loginUser(email, password)
-                        .then(success => {
-                            if (success) {
-                                loginMessage.textContent = "Login successful! Redirecting...";
-                                loginMessage.className = "mt-3 text-center text-success";
-                                // Redirection is now handled by _processAuthSuccess in main.js
-                            } else {
-                                loginMessage.textContent = "Invalid email or password.";
-                                loginMessage.className = "mt-3 text-center text-danger";
-                            }
+                        .then(user => { // The `user` object is returned on success
+                            loginMessage.textContent = "Login successful! Redirecting...";
+                            loginMessage.className = "mt-3 text-center text-success";
+                            window._processAuthSuccess(user); // Call global success handler
                         })
                         .catch(error => {
                             loginMessage.textContent = error.message || "An unexpected error occurred during login.";
@@ -243,7 +238,6 @@
             });
         });
     </script>
-
 </body>
 
 </html>

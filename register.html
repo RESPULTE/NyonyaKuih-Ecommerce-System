@@ -237,16 +237,10 @@
                 // Call the global registerUser function from main.js
                 if (typeof window.registerUser === 'function') {
                     window.registerUser(email, password, name)
-                        .then(success => {
-                            if (success) {
-                                registerMessage.textContent = "Registration successful! Redirecting...";
-                                registerMessage.className = "mt-3 text-center text-success";
-                                // Redirection is now handled by _processAuthSuccess in main.js
-                            } else {
-                                // This branch is hit if the username (email) already exists
-                                registerMessage.textContent = "An account with this email already exists. Please login.";
-                                registerMessage.className = "mt-3 text-center text-danger";
-                            }
+                        .then(user => { // The `user` object is returned on success
+                            registerMessage.textContent = "Registration successful! Redirecting...";
+                            registerMessage.className = "mt-3 text-center text-success";
+                            window._processAuthSuccess(user); // Call global success handler
                         })
                         .catch(error => {
                             registerMessage.textContent = error.message || "An unexpected error occurred during registration.";
@@ -261,7 +255,6 @@
             });
         });
     </script>
-
 </body>
 
 </html>
