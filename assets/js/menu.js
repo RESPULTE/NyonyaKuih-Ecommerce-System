@@ -86,18 +86,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const filterItems = () => {
             const searchTerm = searchInput.val().toLowerCase().trim();
-            const activeTabPane = kuihTabContent.find('.tab-pane.active.show');
-            if (!activeTabPane.length) return;
+            let anyVisible = false;
 
-            let tabHasVisibleItems = false;
-            activeTabPane.find('.menu-item').each(function () {
-                const name = $(this).find('h4').text().toLowerCase();
-                const ingredients = $(this).find('.ingredients').text().toLowerCase();
-                const isVisible = name.includes(searchTerm) || ingredients.includes(searchTerm);
-                $(this).toggle(isVisible);
-                if (isVisible) tabHasVisibleItems = true;
+            // Filter all tabs, not just the active one
+            kuihTabContent.find('.tab-pane').each(function () {
+                let tabHasVisibleItems = false;
+                $(this).find('.menu-item').each(function () {
+                    const name = $(this).find('h4').text().toLowerCase();
+                    const ingredients = $(this).find('.ingredients').text().toLowerCase();
+                    const isVisible = searchTerm === '' || name.includes(searchTerm) || ingredients.includes(searchTerm);
+                    $(this).toggle(isVisible);
+                    if (isVisible){
+                        tabHasVisibleItems = true;
+                        return;
+                    };
+                });
+                anyVisible = anyVisible || tabHasVisibleItems;
             });
-            noResultsMessage.toggle(!tabHasVisibleItems && searchTerm.length > 0);
+
+            
+
+        // Show "No Results" message if nothing matches
+        noResultsMessage.toggle(searchTerm.length > 0 && !anyVisible);
         };
 
         searchInput.on('keyup', filterItems);
