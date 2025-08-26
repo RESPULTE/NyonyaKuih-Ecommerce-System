@@ -33,14 +33,6 @@
   z-index: 1;
 }
 
-.why-us-bg img {
-  width: 100%;        /* always spans the full width */
-  height: auto;       /* keeps original aspect ratio */
-  object-fit: cover;  /* ensures no distortion */
-  display: block;     /* removes inline gap */
-}
-
-
 .why-us-bg::after {
   content: '';
   position: absolute;
