@@ -1,9 +1,9 @@
 /* Immersive "Why Choose Us" Section */
 .why-us-immersive {
-    position: relative;
-    padding: 80px 0;
-    color: #fff;
-    /* White text for contrast */
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  color: #fff;
 }
 
 .faded-image {
@@ -25,6 +25,8 @@
     mask-size: contain;
 }
 
+
+
 .why-us-bg {
   position: absolute;
   inset: 0;
@@ -41,7 +43,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-color: rgba(51, 47, 47, 0.9); /* overlay */
+  background-color: rgba(51, 47, 47, 0.8); /* overlay */
   z-index: 2;
 }
 
