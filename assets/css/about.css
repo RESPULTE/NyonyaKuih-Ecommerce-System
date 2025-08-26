@@ -25,22 +25,24 @@
     mask-size: contain;
 }
 
-
 .why-us-bg {
-    position: absolute;
-    inset: 0;
-    background: url('../img/bg-about.png') center center no-repeat;
-    background-size: cover;
-    z-index: 1;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.why-us-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* keeps image proportional and fills */
 }
 
 .why-us-bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-color: rgba(51, 47, 47, 0.9);
-    /* Dark Brown Overlay from your palette */
-    z-index: 2;
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(51, 47, 47, 0.9); /* overlay */
+  z-index: 2;
 }
 
 .why-us-immersive .container {
