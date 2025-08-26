@@ -29,7 +29,7 @@
 .why-us-bg {
     position: absolute;
     inset: 0;
-    background: url('assets/img/bg-about.png') center center no-repeat;
+    background: url('../img/bg-about.png') center center no-repeat;
     background-size: cover;
     z-index: 1;
 }
